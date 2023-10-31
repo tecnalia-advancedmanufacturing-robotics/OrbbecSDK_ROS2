@@ -2,9 +2,9 @@
 
 The Orbbec SDK ROS2 is a wrapper for the Orbbec 3D camera that provides seamless integration with the ROS2 environment. It supports ROS2 Foxy, Galactic, and Humble distributions.
 
-## Quick start
+## 1.Quick start
 
-### Environment setup
+### 1.1 Environment setup
 
 * Install ROS2: Please refer to the official [ROS 2 installation guide](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html) guidance.
 
@@ -23,7 +23,7 @@ The Orbbec SDK ROS2 is a wrapper for the Orbbec 3D camera that provides seamless
     ros-$ROS_DISTRO-image-transport ros-$ROS_DISTRO-image-publisher ros-$ROS_DISTRO-camera-info-manager
     ```
 
-### Build
+### 1.2 Build
 
 * Create `colcon` workspace
 
@@ -46,7 +46,7 @@ The Orbbec SDK ROS2 is a wrapper for the Orbbec 3D camera that provides seamless
     colcon build --event-handlers  console_direct+  --cmake-args  -DCMAKE_BUILD_TYPE=Release
     ```
 
-### Run
+### 1.3 Run
 
 * Install the udev rules file for usb device access
 
@@ -79,13 +79,11 @@ The Orbbec SDK ROS2 is a wrapper for the Orbbec 3D camera that provides seamless
 
     After rviz2 is launched, add `/camera/depth/image_raw/image` topic in `Displays` tab, then you can see the depth stream.
 
-## Capability
-
-### Nodes
+## 2.Nodes
 
 The Orbbec SDK ROS2 contains 4 nodes, which are packaged in the `orbbec_camera` package.
 
-#### orbbec_camera_node
+### 2.1 orbbec_camera_node
 
 This node is the main node to configure device and get data stream from device. It always need to be launched with a launch file, because it needs to be configured with many parameters, such as image resolution, image format, etc.
 
@@ -95,36 +93,9 @@ Launch this node with pre-defined launch file:
 ros2 launch orbbec_camera astra.launch.py # more pre-defined launch file, see below table
 ```
 
-#### list_devices_node
+#### 2.1.1 Pre-defined launch files
 
-This node is used to list all connected devices, and print out the information of each device.
-
-``` bash
-# make should you device has been connected and has not been open by other node before run this.
-ros2 run orbbec_camera list_devices_node
-```
-
-#### list_camera_profile_mode_node
-
-This node is used to list all supported camera and profile (resolution, frame rate, image format) of the default device (the first device enumerated).
-
-``` bash
-# make should you device has been connected and has not been open by other node before run this.
-ros2 run orbbec_camera list_camera_profile_mode_node
-```
-
-#### list_depth_work_mode_node
-
-For some models (Gemini 2, Gemini 2 L and Gemini 2 XL), there are multiple depth work modes. This node is used to list all supported depth work mode for default device (the first device enumerated).
-
-``` bash
-# make should you device has been connected and has not been open by other node before run this.
-ros2 run orbbec_camera list_depth_work_mode_node
-```
-
-### Pre-defined launch files
-
-You can use ROS launch file configure and launch `orbbec_camera_node`, there are many pre-defined launch files write in Python for different device:
+You can configure and launch the `orbbec_camera_node `using a ROS launch file. There are many pre-defined launch files written in Python for different device.
 
 | **products**     | **firmware version**             |**launch file**          |**descriptor**                                           |
 | ---              | ---                              | ---                     | ---                                                     |
@@ -150,15 +121,15 @@ Different devices have different supported parameters, parameter value range and
 
 You can modify those parameters value in the pre-defined file, or create a new custom launch file yourself. For further information, please refer to [docs/launch_file_usage.md](docs/launch_file_usage.md).
 
-### Topics
+#### 2.1.2 Topics
 
-The Orbbec SDK ROS2 use topic to pass camera info, image data, and point cloud data. After `orbbec_camera_node` launched, typing this to list all available topics:
+The `orbbec_camera_node` use topic to pass camera info, image data, and point cloud data. After `orbbec_camera_node` launched, typing this to list all available topics:
 
 ``` shell
 ros2 topic list -t |grep camera
 ```
 
-#### All available topics
+All available topics:
 
 * `/camera/color/camera_info`: The color camera info.
 * `/camera/color/image_raw`: The color stream image.
@@ -172,9 +143,9 @@ ros2 topic list -t |grep camera
 
 *Note: You can use rviz2 to subscribe those topics to see the data.*
 
-### Services
+#### 2.1.3 Services
 
-When `orbbec_camera_node` launched, you can use services to set or get parameters of device, such as toggle stream
+After `orbbec_camera_node` launched, you can use services to set or get parameters of device, such as toggle stream
 on/off, set/get exposure time, set/get gain, etc.
 
 For example:
@@ -188,26 +159,54 @@ ros2 service call /camera/set_color_exposure orbbec_camera_msgs/srv/SetInt32 '{d
 
 Please refer to [docs/services.md](docs/services.md) for more information about services and list of all supported services.
 
-## Advance
 
-### Multiple devices
+### 2.2 list_devices_node
+
+This node is used to list all connected devices, and print out the information of each device.
+
+``` bash
+# make should you device has been connected and has not been open by other node before run this.
+ros2 run orbbec_camera list_devices_node
+```
+
+### 2.3 list_camera_profile_mode_node
+
+This node is used to list all supported camera and profile (resolution, frame rate, image format) of the default device (the first device enumerated).
+
+``` bash
+# make should you device has been connected and has not been open by other node before run this.
+ros2 run orbbec_camera list_camera_profile_mode_node
+```
+
+### 2.4 list_depth_work_mode_node
+
+For some models (Gemini 2, Gemini 2 L and Gemini 2 XL), there are multiple depth work modes. This node is used to list all supported depth work mode for default device (the first device enumerated).
+
+``` bash
+# make should you device has been connected and has not been open by other node before run this.
+ros2 run orbbec_camera list_depth_work_mode_node
+```
+
+## 3. Advance
+
+### 3.1 Multiple devices
 
 Using multiple devices to capture camera data from multiple angles and positions can provide more information and diversity to enhance the performance of application algorithms, please refer to [docs/multiple_devices.md](docs/multiple_devices.md) to configure and launch multiple devices.
 
-### Use hardware decoder to decode JPEG
+### 3.2 Use hardware decoder to decode JPEG
 
-### rockchip and Amlogic
+#### 3.2.1 rockchip and Amlogic
 
 Depends on `rockchip-mpp-dev` and `rockchip-rga-dev`, not all systems have these two packages, the names may be
 different, please search by yourself.
 Open `CMakeLists.txt` and set `USE_RK_HW_DECODER` to `ON`.
 
-### Nvidia Jetson
+#### 3.2.2 Nvidia Jetson
 
 Depends on: `jetson_multimedia_api`,`libyuv`.
 Open `CMakeLists.txt` and set `USE_NV_HW_DECODER` to `ON`.
 
-### Depth work mode switch
+### 3.3 Depth work mode switch
 
 * The depth work mode switch is supported by Gemini 2, Gemini 2 L, and Gemini 2 XL cameras.
 * Before starting the camera, depth work mode (depth_work_mode) can be configured for the corresponding xxx.launch.py file's support.
@@ -228,7 +227,7 @@ Open `CMakeLists.txt` and set `USE_NV_HW_DECODER` to `ON`.
 ros2 run orbbec_camera list_depth_work_mode_node
 ```
 
-### Configuration of depth NFOV and WFOV modes
+### 3.4 Configuration of depth NFOV and WFOV modes
 
 For the Femto Mega and Femto Bolt devices, the NFOV and WFOV modes are implemented by configuring the resolution of Depth and IR in the launch file.
 In launch file, depth_width、depth_height、ir_width、ir_height represents the resolution of the depth  and the resolution of the IR.
@@ -239,13 +238,13 @@ The frame fps and resolution of IR must be consistent with the depth. The corres
 * WFOV unbinned: 1024 x 1024.
 * WFOV binned: 512 x 512.
 
-### DDS Tuning
+### 3.5 DDS Tuning
 
 The default DDS settings (Galactic) may not be optimal for data transmission， which may cause the data stream frame rate to fall short of the configuration requirements.
 
 Please refer to [docs/dds_tuning.md](docs/dds_tuning.md) to optimize the DDS settings.
 
-## Frequently Asked Questions
+## 4. Frequently Asked Questions
 
 * it's possible that the power supply is insufficient.
   To avoid this, do not connect all cameras to the same hub and use a powered hub instead.
@@ -259,7 +258,7 @@ Why are there so many launch files here
   files is due to the fact that the default resolutions and image formats of different cameras vary.
   To make it easier to use, the launch files have been separated for each camera.
 
-## License
+## 5. License
 
 Copyright 2023 Orbbec Ltd.
 
