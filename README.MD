@@ -48,7 +48,7 @@ The Orbbec SDK ROS2 is a wrapper for the Orbbec 3D camera that provides seamless
 
 ### 1.3 Run
 
-* Install the udev rules file for usb device access
+* Install udev rules file to get usb device access permission
 
     ```bash
     cd  ~/ros2_ws/src/OrbbecSDK_ROS2/orbbec_camera/scripts
@@ -60,7 +60,7 @@ The Orbbec SDK ROS2 is a wrapper for the Orbbec 3D camera that provides seamless
 
     ```bash
     cd ~/ros2_ws/
-    . ./install/setup.bash
+    source ./install/setup.bash  # or source ./install/setup.zsh if you are using zsh
     ```
 
 * Launch camera node
@@ -95,7 +95,7 @@ ros2 launch orbbec_camera astra.launch.py # more pre-defined launch file, see be
 
 #### 2.1.1 Pre-defined launch files
 
-You can configure and launch the `orbbec_camera_node `using a ROS launch file. There are many pre-defined launch files written in Python for different device.
+You can configure and launch the `orbbec_camera_node` using a ROS launch file. There are many pre-defined launch files written in Python for different device.
 
 | **products**     | **firmware version**             |**launch file**          |**descriptor**                                           |
 | ---              | ---                              | ---                     | ---                                                     |
@@ -148,17 +148,23 @@ All available topics:
 After `orbbec_camera_node` launched, you can use services to set or get parameters of device, such as toggle stream
 on/off, set/get exposure time, set/get gain, etc.
 
-For example:
+* Usage:
 
-``` bash
-# get color camera exposure time
-ros2 service call /camera/get_color_exposure orbbec_camera_msgs/srv/GetInt32 '{}'
-# set color camera exposure time
-ros2 service call /camera/set_color_exposure orbbec_camera_msgs/srv/SetInt32 '{data:156}'
-```
+    ``` bash
+    # get color camera exposure time
+    ros2 service call /camera/get_color_exposure orbbec_camera_msgs/srv/GetInt32 '{}'
+    # set color camera exposure time
+    ros2 service call /camera/set_color_exposure orbbec_camera_msgs/srv/SetInt32 '{data:156}'
+    # you can replace to other available service get/set more parameters
+    ```
 
-Please refer to [docs/services.md](docs/services.md) for more information about services and list of all supported services.
+* List all available services:
 
+    ```  bash
+    ros2 service list -t | grep camera
+    ```
+
+Please refer to [docs/services.md](docs/services.md) for more information about services.
 
 ### 2.2 list_devices_node
 

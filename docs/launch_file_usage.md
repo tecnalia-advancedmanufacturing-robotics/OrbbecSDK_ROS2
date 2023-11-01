@@ -4,7 +4,7 @@ We have provide many pre-defined launch files on launch folder to configure and 
 command on `colcon` workspace（such as `~/ros2_ws`）.
 
 ```bash
-. ./install/setup.bash
+source ./install/setup.bash # or source ./install/setup.zsh if you are using zsh
 ros2 launch orbbec_camera astra.launch.py # replace astra.launch.py with other launch file for your camera.
 ```
 

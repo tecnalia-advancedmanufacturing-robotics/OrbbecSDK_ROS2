@@ -1,487 +1,267 @@
-# orbbec_camera
+# Orbbec SDK ROS2
 
----
-Orbbec SDK ROS2 是用于 Orbbec 3D 相机的 ROS2 wrapper ，可与 ROS2 环境无缝集成，并支持 ROS2 Foxy、Galactic 和 Humble 发行版。## 安装指南
+Orbbec SDK ROS2 是一个 Orbbec SDK 的 ROS2 封装，为 Orbbec 3D 相机提供无缝集成。支持 ROS2 Foxy, Galactic, 和 Humble 发行版。
 
-##
-安装 ROS2
+## 1.快速开始
 
-- 请参考官方
-  [ROS2 安装指南](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)
+### 1.1 环境设置
 
-> 如果你的 ROS2 命令不能自动补全，把下面两行代码放在你的 `.bashrc`
-> 或者 `.zshrc`
+* 安装 ROS2: 请参考官方安装指导[ROS 2 installation guide](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)。
+* 命令自动补全[可选]: 把下面的两行代码放到 `.bashrc` 或者 `.zshrc` 中。
 
-```bash
-eval "$(register-python-argcomplete3 ros2)"
-eval "$(register-python-argcomplete3 colcon)"
+    ```bash
+    eval "$(register-python-argcomplete3 ros2)"
+    eval "$(register-python-argcomplete3 colcon)"
+    ```
+
+* 安装依赖
+
+    ```bash
+    # assume you have sourced ROS environment, same blow
+    sudo apt install libgflags-dev nlohmann-json3-dev libgoogle-glog-dev \
+    ros-$ROS_DISTRO-image-transport ros-$ROS_DISTRO-image-publisher ros-$ROS_DISTRO-camera-info-manager
+    ```
+
+### 1.2 编译
+
+* 创建 `colcon` 工作空间
+
+    ```bash
+    mkdir -p ~/ros2_ws/src
+    ```
+
+* 获取源码
+
+    ```bash
+    cd ~/ros2_ws/src
+    git clone https://github.com/orbbec/OrbbecSDK_ROS2.git
+    ```
+
+* 编译
+
+    ```bash
+    cd ~/ros2_ws/
+    # build release, Default is Debug
+    colcon build --event-handlers  console_direct+  --cmake-args  -DCMAKE_BUILD_TYPE=Release
+    ```
+
+### 1.3 运行
+
+* 安装 udev 规则文件，以获得 usb 设备访问权限
+
+    ```bash
+    cd  ~/ros2_ws/src/OrbbecSDK_ROS2/orbbec_camera/scripts
+    sudo bash install_udev_rules.sh
+    sudo udevadm control --reload-rules && sudo udevadm trigger
+    ```
+
+* 配置环境(**每次打开新终端都要执行**)
+
+    ```bash
+    cd ~/ros2_ws/
+    source ./install/setup.bash  # or source ./install/setup.zsh if you are using zsh
+    ```
+
+* 启动相机节点
+
+    ```bash
+    # On terminal 1
+    ros2 launch orbbec_camera astra.launch.py # or other launch file, see below table
+    ```
+
+* 启动 rviz2 查看数据流
+
+    ```bash
+    # On terminal 2
+    rviz2
+    ```
+
+    rviz2 启动后，在 `Displays` 标签中添加 `/camera/depth/image_raw/image` topic，即可看到深度数据流。
+
+## 2.Nodes
+
+Orbbec SDK ROS2 提供4个节点，它们都被打包在 `orbbec_camera` 包中。
+
+### 2.1 orbbec_camera_node
+
+这个是主要 node，用来配置设备，获取数据并发布数据流。它需要被一个启动文件启动，因为需要配置很多参数，比如图像分辨率，图像格式等
+
+通过于定义好的 launch 文件启动该 node:
+
+``` bash
+ros2 launch orbbec_camera astra.launch.py # more pre-defined launch file, see below table
 ```
 
-创建 `colcon` 工作空间
+#### 2.1.1 预定义 launch 文件
 
-```bash
-mkdir -p ~/ros2_ws/src
-cd ~/ros2_ws/src
+你可以通过 ROS launch 文件配置和启动 `orbbec_camera_node`。Orbbec SDK ROS2 提供了许多预定义的 launch 文件，用于不同的设备。
+
+| **products**     | **firmware version**             |**launch file**          |**descriptor**                                           |
+| ---              | ---                              | ---                     | ---                                                     |
+| Femto            | 1.6.7                            | femto.launch.py         | [ReadMe](orbbec_camera/launch/femto.launch.md)          |
+| Femto W          | 1.1.8                            | femto.launch.py         | [ReadMe](orbbec_camera/launch/femto.launch.md)          |
+| Femto Bolt       | 1.0.6  (unsupported ARM32)       | femto_bolt.launch.py    | [ReadMe](orbbec_camera/launch/femto_bolt.launch.md)     |
+| Femto Mega       | 1.1.7  (ubuntu20.04,ubuntu22.04) | femto_mega.launch.py    | [ReadMe](orbbec_camera/launch/femto_mega.launch.md)     |
+| Gemini           | 3.0.18                           | gemini.launch.py        | [ReadMe](orbbec_camera/launch/gemini.launch.md)         |
+| Gemini E         | 3460                             | gemini_e.launch.py      | [ReadMe](orbbec_camera/launch/gemini_e.launch.md)       |
+| Gemini E Lite    | 3606                             | gemini_e_lite.launch.py | [ReadMe](orbbec_camera/launch/gemini_e_lite.launch.md)  |
+| Gemini 2         | 1.4.60 /1.4.76                   | gemini2.launch.py       | [ReadMe](orbbec_camera/launch/gemini2.launch.md)        |
+| Gemini 2 L       | 1.4.32                           | gemini2L.launch.py      | [ReadMe](orbbec_camera/launch/gemini2L.launch.md)       |
+| Gemini 2 XL      | Obox: V1.2.5  VL:1.4.54          | gemini2XL.launch.py     | [ReadMe](orbbec_camera/launch/gemini2XL.launch.md)      |
+| Astra+           | 1.0.22/1.0.21/1.0.20/1.0.19      | astra_adv.launch.py     | [ReadMe](orbbec_camera/launch/astra_adv.launch.md)      |
+| Astra Mini Pro   | 1007                             | astra.launch.py         | [ReadMe](orbbec_camera/launch/astra.launch.md)          |
+| Astra Mini S Pro | 1.0.05                           | astra.launch.py         | [ReadMe](orbbec_camera/launch/astra.launch.md)          |
+| Astra 2          | 2.8.20                           | astra2.launch.py        | [ReadMe](orbbec_camera/launch/astra2.launch.md)         |
+| DaBai            | 2436                             | dabai.launch.py         | [ReadMe](orbbec_camera/launch/dabai.launch.md)          |
+| DaBai DW         | 2606                             | dabai_dw.launch.py      | [ReadMe](orbbec_camera/launch/dabai_dw.launch.md)       |
+| DaBai DCW        | 2460                             | dabai_dcw.launch.py     | [ReadMe](orbbec_camera/launch/dabai_dcw.launch.md)      |
+
+不同设备支持参数、参数值范围和默认参数值会有不同，请参考每个launch文件的ReadMe文件了解更多信息。
+
+你可以通过修改于定义 launch 文件中的参数值来调整配置，或者重新自定义创建一个新的launch文件。 更多信息，请参考[docs/launch_file_usage.md](docs/launch_file_usage.md)。
+
+#### 2.1.2 Topics
+
+`orbbec_camera_node` 通过 topic 发布相机信息、图像数据、点云数据。`orbbec_camera_node` 启动后，通过如下命令查看所有可用的 topic:
+
+``` shell
+ros2 topic list -t |grep camera
 ```
 
-获取源代码
+所有可用的 topic:
 
-```bash
-cd ~/ros2_ws/src
-git clone https://github.com/orbbec/OrbbecSDK_ROS2.git
-```
+* `/camera/color/camera_info`: 彩色相机信息
+* `/camera/color/image_raw`: 彩色相机图像
+* `/camera/depth/camera_info`: 深度相机信息
+* `/camera/depth/image_raw`: 深度相机图像
+* `/camera/depth/points`: 点云数据，仅当 `enable_point_cloud` 为 `true` 时可用
+* `/camera/depth_registered/points`: 彩色点云数据，仅当 `enable_colored_point_cloud` 为 `true
+* `/camera/ir/camera_info`: IR相机信息
+* `/camera/ir/image_raw`: IR相机图像
 
-安装 deb 依赖
+*Note: 你可以打开rviz2，订阅这些topic来查看相关数据。*
 
-```bash
-# assume you have sourced ROS environment, same blow
-sudo apt install libgflags-dev nlohmann-json3-dev libgoogle-glog-dev \
-ros-$ROS_DISTRO-image-transport ros-$ROS_DISTRO-image-publisher ros-$ROS_DISTRO-camera-info-manager
-```
+#### 2.1.3 Services
 
-安装 udev rules.
+After `orbbec_camera_node` launched, you can use services to set or get parameters of device, such as toggle stream
+on/off, set/get exposure time, set/get gain, etc.
+`orbbec_camera_node` 启动后, 你可以使用 service 来设置或获取设备参数，如打开/关闭流，设置/获取曝光时间，设置/获取增益，等等。
 
-```bash
-cd ~/ros2_ws/src/OrbbecSDK_ROS2/orbbec_camera/scripts
-sudo bash install_udev_rules.sh
-sudo udevadm control --reload-rules && sudo udevadm trigger
-```
+* 用例:
 
-## 入门指南
+    ``` bash
+    # get color camera exposure time
+    ros2 service call /camera/get_color_exposure orbbec_camera_msgs/srv/GetInt32 '{}'
+    # set color camera exposure time
+    ros2 service call /camera/set_color_exposure orbbec_camera_msgs/srv/SetInt32 '{data:156}'
+    # you can replace to other available service get/set more parameters
+    ```
 
-```bash
-cd ~/ros2_ws/
-# build release, Default is Debug
-colcon build --event-handlers  console_direct+  --cmake-args  -DCMAKE_BUILD_TYPE=Release
-```
+* 获取所有可用的 service:
 
-启动相机。
+    ```  bash
+    ros2 service list -t | grep camera
+    ```
 
-- 在终端 1。
+请参考 [docs/services.md](docs/services.md) 获取更多关于 service 信息。
 
-```bash
-. ./install/setup.bash
-ros2 launch orbbec_camera astra.launch.py # or other launch file, see below table
-```
+### 2.2 list_devices_node
 
-- 在终端 2。
+该 node 用于列出所有连接的设备，并打印出每个设备的详细信息。
 
-```bash
-. ./install/setup.bash
-rviz2
-```
-
-选择你想展示的 topic。
-
-- 列出 topics / services/ parameters (新开一个终端)。
-
-```bash
-ros2 topic list
-ros2 service list
-ros2 param list
-```
-
-- 显示深度到彩色的外参。
-
-```bash
-ros2 topic echo --qos-durability=transient_local /camera/extrinsic/depth_to_color  --qos-profile=services_default
-```
-
-- 获取设备信息
-
-```bash
-ros2 service call /camera/get_device_info orbbec_camera_msgs/srv/GetDeviceInfo '{}'
-```
-
-- 查看 SDK 版本
-
-```bash
-ros2 service call /camera/get_sdk_version orbbec_camera_msgs/srv/GetString '{}'
-
-```
-
-- 查看曝光值
-
-```bash
-ros2 service call /camera/get_color_exposure orbbec_camera_msgs/srv/GetInt32 '{}'
-```
-
-> 如果你需要查看 `ir` 或者 `depth` 的曝光, 请把 `/camera/get_color_exposure`
-> 改成 `/camera/get_ir_exposure` 或者 `/camera/get_depth_exposure`, 下同.
-
-- 查看增益
-
-```bash
-ros2 service call /camera/get_color_gain orbbec_camera_msgs/srv/GetInt32 '{}'
-```
-
-- 查看白平衡
-
-```bash
-ros2 service call /camera/get_white_balance orbbec_camera_msgs/srv/GetInt32 '{}'
-```
-
-- 设置自动曝光
-
-```bash
-ros2 service call /camera/set_color_auto_exposure std_srvs/srv/SetBool '{data: false}'
-```
-
-- 设置白平衡
-
-```bash
-ros2 service call /camera/set_white_balance orbbec_camera_msgs/srv/SetInt32 '{data: 4600}'
-```
-
-- 开关激光
-
-```bash
-ros2 service call  /camera/set_laser_enable std_srvs/srv/SetBool "{data: true}"
-```
-
-- 开关 senseor
-
-```bash
-ros2 service call /camera/toggle_ir std_srvs/srv/SetBool "{data : true}"
-
-```
-
-- 保存点云
-
-```bash
-ros2 service call /camera/save_point_cloud std_srvs/srv/Empty "{}"
-```
-
-### 所有相机控制的 service
-
-下面的这些服务的名字已经表明了它的功能，但是要注意的是只有当在 launch 文件里面把相关数据流打开的时候才能用。
-
-- `/camera/get_auto_white_balance`
-- `/camera/get_color_exposure`
-- `/camera/get_color_gain`
-- `/camera/get_depth_exposure`
-- `/camera/get_depth_gain`
-- `/camera/get_device_info`
-- `/camera/get_ir_exposure`
-- `/camera/get_ir_gain`
-- `/camera/get_ldp_status`
-- `/camera/get_sdk_version`
-- `/camera/get_white_balance`
-- `/camera/set_auto_white_balance`
-- `/camera/set_color_auto_exposure`
-- `/camera/set_color_exposure`
-- `/camera/set_color_gain`
-- `/camera/set_depth_auto_exposure`
-- `/camera/set_depth_exposure`
-- `/camera/set_depth_gain`
-- `/camera/set_fan_work_mode`
-- `/camera/set_floor_enable`
-- `/camera/set_ir_auto_exposure`
-- `/camera/set_ir_exposure`
-- `/camera/set_ir_gain`
-- `/camera/set_laser_enable`
-- `/camera/set_ldp_enable`
-- `/camera/set_white_balance`
-- `/camera/toggle_color`
-- `/camera/toggle_depth`
-- `/camera/toggle_ir`
-
-### 所有的 topic
-
-- `/camera/color/camera_info` : 彩色相机信息。
-- `/camera/color/image_raw`: 彩色数据流图像。
-- `/camera/depth/camera_info`: 深度相机信息。
-- `/camera/depth/image_raw`: 深度相机数据流图像。
-- `/camera/depth/points` : 点云，只有  `enable_point_cloud` 设置为 `true` 才可用。
-- `/camera/depth_registered/points`: 彩色点云  `enable_colored_point_cloud` 还有 `depth_registration`
-  都设置为 `true` 才可用。
-- `/camera/ir/camera_info`:  IR 相机信息。
-- `/camera/ir/image_raw`: 红外数据流图像。
-
-### 多相机
-
-- 首先需要获取所有相机的 USB Port, 插入所有的相机在终端执行以下命令:
-
-```bash
+``` bash
+# make should you device has been connected and has not been open by other node before run this.
 ros2 run orbbec_camera list_devices_node
 ```
 
-- 把参数 `device_num` 设置成为你的相机数量。
-- 编辑 `OrbbecSDK_ROS2/launch/multi_xxx.launch.py` 修改相机的 `usb_port`。
-- 注意不要忘记在 `include` 加上 `group` 标签，不然前面的相机的参数会污染后面的相机的参数。
+### 2.3 list_camera_profile_mode_node
 
-```python
-from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, GroupAction, ExecuteProcess
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch_ros.actions import Node
-from ament_index_python.packages import get_package_share_directory
-import os
+该 node 用于列出默认设备(第一个枚举到的设备)所有支持的相机和支持的分辨率、帧率、图像格式。
 
-
-def generate_launch_description():
-    # Node configuration
-    cleanup_node = Node(
-        package='orbbec_camera',
-        executable='ob_cleanup_shm_node',
-        name='camera',
-        output='screen'
-    )
-
-    # Include launch files
-    package_dir = get_package_share_directory('orbbec_camera')
-    launch_file_dir = os.path.join(package_dir, 'launch')
-    launch1_include = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, 'gemini2.launch.py')
-        ),
-        launch_arguments={
-            'camera_name': 'camera_01',
-            'usb_port': '6-2.4.4.2',  # replace your usb port here
-            'device_num': '2'
-        }.items()
-    )
-
-    launch2_include = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(launch_file_dir, 'gemini2.launch.py')
-        ),
-        launch_arguments={
-            'camera_name': 'camera_02',
-            'usb_port': '6-2.4.1',  # replace your usb port here
-            'device_num': '2'
-        }.items()
-    )
-
-    # If you need more cameras, just add more launch_include here, and change the usb_port and device_num
-
-    # Launch description
-    ld = LaunchDescription([
-        cleanup_node,
-        GroupAction([launch1_include]),
-        GroupAction([launch2_include]),
-    ])
-
-    return ld
-
+``` bash
+# make should you device has been connected and has not been open by other node before run this.
+ros2 run orbbec_camera list_camera_profile_mode_node
 ```
 
-- 请注意，Astra 相机使用信号量进行进程同步。如果相机启动失败，信号量文件可能会留在 `/dev/shm`
-  目录下，导致下一次启动卡住。为了避免这种情况，请在启动前运行以下命令：
+### 2.4 list_depth_work_mode_node
+对于某些型号设备(Gemini 2, Gemini 2 L 和 Gemini 2 XL)，有多个深度工作模式。该 node 用于列出所认设备(第一个枚举到的设备)所有支持的深度工作模式。
 
-```bash
-ros2 run orbbec_camera ob_cleanup_shm_node
-```
-
-这个命令会清理掉 `/dev/shm/` 下面的文件
-
-- 执行下面的命令启动多相机:
-
-```bash
-ros2 launch orbbec_camera multi_camera.launch.py
-```
-
-## 调用硬件解码 JPEG
-
-### rockchip 和 Amlogic
-
-依赖  `rockchip-mpp-dev` 和 `rockchip-rga-dev`, 不是所有的系统都有这两个包， 名字可能不一样， 请自行搜索。
-打开 `CMakeLists.txt` 把 `USE_RK_HW_DECODER` 设置为 `ON`。
-
-### Nvidia Jetson
-
-依赖 : `jetson_multimedia_api`,`libyuv` 。
-打开 `CMakeLists.txt` 把 `USE_NV_HW_DECODER` 设置为 `ON`。
-
-## 启动参数
-
-以下是可用的启动参数
-
-- `connection_delay`: 重新打开设备的延迟时间（以毫秒为单位）。某些设备，例如 Astra mini，需要更长的时间来初始化，立即重新打开设备可能会在热插拔时导致固件崩溃。
-- `enable_point_cloud`: 是否开启点云。
-- `enable_colored_point_cloud`: 是否开启彩色点云。
-- `point_cloud_qos`, `[color|depth|ir]_qos,``[color|depth|ir]_camera_info_qos`:
-  ROS2 消息质量服务（QoS）设置。可能的值是 `SYSTEM_DEFAULT`，`DEFAULT`，`PARAMETER_EVENTS`，`SERVICES_DEFAULT`，`PARAMETERS`，`SENSOR_DATA`
-  ，并且不区分大小写。这些对应于 `rmw_qos_profile_system_default`，`rmw_qos_profile_default`，`rmw_qos_profile_parameter_events`，`rmw_qos_profile_services_default`，`rmw_qos_profile_parameters`。
-- `enable_d2c_viewer`: 发布 D2C 叠加图像（仅用于测试）。
-- `device_num`: 设备数量。如果需要多个相机，则必须填写此项。
-- `color_width`, `color_height`, `color_fps`: 彩色流的分辨率和帧率。
-- `ir_width`, `ir_height`, `ir_fps`: 红外流的分辨率和帧率。
-- `depth_width`, `depth_height`, `depth_fps`: 深度流的分辨率和帧率。
-- `enable_color`: 是否启用 RGB 相机。
-- `enable_depth`: 启用深度相机。
-- `enable_ir`: 是否开启 IR 相机。
-- `depth_registration`: 是否启用将深度帧硬件对齐到彩色帧。当 `enable_colored_point_cloud` 设置为 `true`
-  时，此字段也要设置为 `true`。
-- `usb_port` : USB 端口号，当使用多个相机时，这是必需的。
-- `enable_accel`: 是否启用加速度计。
-- `accel_rate` : 加速度计的频率， 可选值为 `1.5625hz`,`3.125hz`,`6.25hz`,`12.5hz`,`25hz`,`50hz`,
-  `100hz`,`200hz`,`500hz`,`1khz`,`2khz`,`4khz`,`8khz`,`16khz`,`32khz`。具体的值取决于当前的相机型号。
-- `accel_range` : 加速度计的量程, 可选值为 `2g`,`4g`,`8g`,`16g`。具体的值取决于当前的相机型号。
-- `enable_gyro` : 是否启用陀螺仪。
-- `gyro_rate` : 陀螺仪的频率, 可选值为 `1.5625hz`,`3.125hz`,`6.25hz`,`12.5hz`,`25hz`,`50hz`,
-  `100hz`,`200hz`,`500hz`,`1khz`,`2khz`,`4khz`,`8khz`,`16khz`,`32khz`。具体的值取决于当前的相机型号。
-- `gyro_range` : 陀螺仪的量程, 可选值为 `16dps`,`31dps`,`62dps`,`125dps`,`250dps`,`500dps`,`1000dps`,`2000dps`
-  。具体的值取决于当前的相机型号。
-- `enumerate_net_device` : 是否开启枚举网络设备的功能，true 为开启，false 为关闭，仅 Femto mega 和 Gemini 2 XL 设备支持。
-  当通过网络方式访问以上设备时，需提前配置好设备的 IP 地址，使能开关需要配置成 true。
-
-## 深度模式切换：
-- 启动相机前, 可通过配置对应相继的 xxx.launch.py 的深度模式 (depth_work_mode) 支持。
-- 深度模式切换支持的相机: Gemini 2, Gemini 2 L,Gemini 2 XL。
-- xxx.launch.py 默认深度模式配置为相机默认配置, 如果需要修改可根据需要切换相应深度模式。
-- 具体相机深度模式支持类型可查看深度模式的注释。
-
-```python
-    # Depth work mode support is as follows:
-    # Unbinned Dense Default
-    # Unbinned Sparse Default
-    # Binned Sparse Default
-    DeclareLaunchArgument('depth_work_mode', default_value='')
-```
-
-- 深度工作模式查看:
-
-```bash
+``` bash
+# make should you device has been connected and has not been open by other node before run this.
 ros2 run orbbec_camera list_depth_work_mode_node
 ```
 
-## 深度 NFOV 和 WFOV 模式配置
-对于 Femto Mega 和 Femto Bolt 设备，深度 NFOV 和 WFOV 模式通过在 launch 文件中配置 Depth 和 IR 的分辨率实现。
-在 launch 文件中，`depth_width`, `depth_height`、'ir_width'、‘ir_height’为深度流的分辨率和 IR 流的分辨率。
-IR 的分辨率和帧率必须和深度保持一致。不同模式和分辨率对应关系如下:
-- NFoV unbinned：640 x 576。
-- NFoV binned：320 x 288。
-- WFoV unbinned：1024 x1024。
-- WFoV binned：512 x 512。
+## 3. 高级使用
 
-## 查看相机支持那些 Profile
+### 3.1 多设备使用
 
-  ```bash
-  ros2 run orbbec_camera list_camera_profile_mode_node
-  ```
+使用多个设备采集不同角度和位置的相机数据，可以提供更多信息，从而增加应用算法性能，请参考 [docs/multiple_devices.md](docs/(docs/multiple_devices.md) 配置和启动多个设备。
 
-## 启动文件
+### 3.2 通过硬件解码器解码JPEG
 
-| product serials                              | launch file             |
-|----------------------------------------------|-------------------------|
-| astra+                                       | astra_adv.launch.py     |
-| astra /astra mini /astra mini pro /astra pro | astra.launch.py         |
-| astra mini pro s                             | astra.launch.py         |
-| astra2                                       | astra2.launch.py        |
-| astra stereo s                               | stereo_s_u3.launch.py   |
-| dabai                                        | dabai.launch.py         |
-| dabai d1                                     | dabai_d1.launch.py      |
-| dabai dcw                                    | dabai_dcw.launch.py     |
-| dabai dw                                     | dabai_dw.launch.py      |
-| dabai pro                                    | dabai_pro.launch.py     |
-| deeya                                        | deeya.launch.py         |
-| femto  /femto w                              | femto.launch.py         |
-| femto mega                                   | femto_mega.launch.py    |
-| femto bolt                                   | femto_bolt.launch.py    |
-| gemini                                       | gemini.launch.py        |
-| gemini                                       | gemini.launch.py        |
-| gemini2 / dabai DCL                          | gemini2.launch.py       |
-| gemini2L                                     | gemini2L.launch.py      |
-| gemini e                                     | gemini_e.launch.py      |
-| gemini e lite                                | gemini_e_lite.launch.py |
+#### 3.2.1 rockchip and Amlogic
 
-实际上所有的 launch 文件都是差不多的内容，只是相机的分辨率和图像格式不同。
-XML launch 文件将会在后续的版本中删除。
+依赖: `rockchip-mpp-dev` 和 `rockchip-rga-dev`，并不是所有的系统都有这些包，包名可能不同，请自行搜索。
+Open `CMakeLists.txt` and set `USE_RK_HW_DECODER` to `ON`.
 
-## 已经支持的硬件产品列表
+#### 3.2.2 Nvidia Jetson
 
-| **SDK version** | **products list** | **firmware version**                      |
-|-----------------|-------------------|-------------------------------------------|
-| v1.8.1          | Gemini 2 XL       | Obox: V1.2.5  VL:1.4.54                   |
-|                 | Astra 2           | 2.8.20                                    |
-|                 | Gemini 2 L        | 1.4.32                                    |
-|                 | Gemini 2          | 1.4.60 /1.4.76                            |
-|                 | Femto Mega        | 1.1.7  (window10、ubuntu20.04、ubuntu22.04) |
-|                 | Astra+            | 1.0.22/1.0.21/1.0.20/1.0.19               |
-|                 | Femto             | 1.6.7                                     |
-|                 | Femto W           | 1.1.8                                     |
-|                 | Femto Bolt        | 1.0.6 (unsupported ARNM32)                |
-|                 | DaBai             | 2436                                      |
-|                 | DaBai DCW         | 2460                                      |
-|                 | DaBai DW          | 2606                                      |
-|                 | Astra Mini Pro    | 1007                                      |
-|                 | Gemini E          | 3460                                      |
-|                 | Gemini E Lite     | 3606                                      |
-|                 | Gemini            | 3.0.18                                    |
-|                 | Astra Mini S Pro  | 1.0.05                                    |
+依赖: `jetson_multimedia_api`,`libyuv`.
+打开 `CMakeLists.txt` 将 `USE_NV_HW_DECODER` 设置为 `ON`.
 
-## DDS Tuning
+### 3.3 深度模式切换
 
-默认的 DDS 设置（humble）可能不适用于数据传输。不同的 DDS 设置可能具有不同的性能。在此示例中，我们使用 CycloneDDS。有关更详细的信息，请参考[ROS DDS Tuning](https://docs.ros.org/en/humble/How-To-Guides/DDS-tuning.html)。
+* The depth work mode switch is supported by Gemini 2, Gemini 2 L, and Gemini 2 XL cameras.
+* Before starting the camera, depth work mode (depth_work_mode) can be configured for the corresponding xxx.launch.py file's support.
+* The default depth work mode configuration of xxx.launch.py is the camera's default configuration. If you need to modify it, you can switch to the corresponding mode as needed.
+* The specific camera depth work mode support types can be found in the comments of the depth mode.
 
-● 编辑 CycloneDDS 配置文件.
+* Gemini 2, Gemini 2 L, and Gemini 2 XL 设备支持切换深度模式。
+* 在启动设备之前，可以通过配置 xxx.launch.py 文件切换支持的深度模式。
+* 在xxx.launch.py 文件中，配置的默认深度模式即为设备默认配置。如果需要修改，可以切换到需要的模式。
 
-```bash
-sudo gedit /etc/cyclonedds/config.xml
-```
+    ```python
+        # Depth work mode support is as follows:
+        # Unbinned Dense Default
+        # Unbinned Sparse Default
+        # Binned Sparse Default
+        DeclareLaunchArgument('depth_work_mode', default_value='')
+    ```
 
-Add
+* 可以通过运行`list_depth_work_mode_node`获取设备支持的深度模式:
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<CycloneDDS xmlns="https://cdds.io/config" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-            xsi:schemaLocation="https://cdds.io/confighttps://raw.githubusercontent.com/eclipse-cyclonedds/cyclonedds/master/etc/cyclonedds.xsd">
-    <Domain id="any">
-        <General>
-            <NetworkInterfaceAddress>lo</NetworkInterfaceAddress>
-            <AllowMulticast>false</AllowMulticast>
-        </General>
-        <Internal>
-            <MinimumSocketReceiveBufferSize>16MB</MinimumSocketReceiveBufferSize>
-        </Internal>
-        <Discovery>
-            <ParticipantIndex>auto</ParticipantIndex>
-            <MaxAutoParticipantIndex>30</MaxAutoParticipantIndex>
-            <Peers>
-                <Peer address="localhost"/>
-            </Peers>
-        </Discovery>
-    </Domain>
-</CycloneDDS>
-```
+    ```bash
+    ros2 run orbbec_camera list_depth_work_mode_node
+    ```
 
-● 设置环境变量，把下面变量添加到. zshrc 或. bashrc 文件中。
+### 3.4 配置深度 NFOV 和 WFOV 模式
 
-```bash
-export ROS_DOMAIN_ID=42 # Numbers from 0 to 232
-export ROS_LOCALHOST_ONLY=1
-export CYCLONEDDS_URI=file:///etc/cyclonedds/config.xml
-```
+对于Femto Mega 和 Femto Bolt 设备，NFOV 和 WFOV 模式是通过在launch文件中配置Depth 和 IR的分辨率实现的。
+在launch文件中，depth_width、depth_height、ir_width、ir_height 分别代表Depth 和 IR的分辨率。
+帧率与IR分辨率必须保持一致，不同模式与分辨率的对应关系如下：
 
-提示：要了解为什么最大的 ROS_DOMAIN_ID 是 232
-请参考[The ROS DOMAIN ID](https://docs.ros.org/en/humble/Concepts/About-Domain-ID.html)
-● 增加 UDP 接收缓冲区大小。编辑
+* NFOV unbinned: 640 x 576.
+* NFOV binned: 320 x 288.
+* WFOV unbinned: 1024 x 1024.
+* WFOV binned: 512 x 512.
 
-```bash
-/etc/sysctl.d/10-cyclone-max.conf
-```
+### 3.5 DDS 调优
 
-添加
+默认的DDS设置（Galactic）可能不是数据传输的最佳设置，这可能导致数据流帧率低于配置要求。
+请参考 [docs/dds_tuning.md](docs/dds_tuning.md) 优化 DDS 设置。
 
-```bash
-net.core.rmem_max=2147483647
-net.core.rmem_default=2147483647
-```
+## 4. 常见问题
 
-## 常见问题
+* 供电不足导致设备无法正常工作。
+  避免将所有相机连接到同一个hub，使用同一个USB hub 供电。
 
-多相机没有图像
+* 分辨率过高
+  如果分辨率设置过高，当系统性能不足时,可能会出现帧率下降的现象。
 
-- 可能是 USB 供电不足导致，可以尝试用供电的 USB hub。
+* 为什么有这么多的预定义 launch 文件?
+  不同设备支持的配置参数及参数值的可配置范围不尽相同，因此需要不同的预定义 launch 文件。
 
-- 也可能是分辨率设置太高，降低分辨率后再尝试。
-
-为什么这里这么多 launch 文件
-
-- 存在多个 launch 文件的原因是因为不同相机的默认分辨率和图像格式不同。为了更方便使用，已将启动文件分开为每个相机一个。
-
-## License
+## 5. License
 
 Copyright 2023 Orbbec Ltd.
 
@@ -490,7 +270,6 @@ the License. You may obtain a copy of the License at
 
 [http://www.apache.org/licenses/LICENSE-2.0](http://www.apache.org/licenses/LICENSE-2.0)
 
-Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "
+AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific
 language governing permissions and limitations under the License.
-
-**Other names and brands may be claimed as the property of others**
