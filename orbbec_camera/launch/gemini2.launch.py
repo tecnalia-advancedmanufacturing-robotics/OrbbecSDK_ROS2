@@ -12,7 +12,6 @@ def generate_launch_description():
     args = [
         DeclareLaunchArgument('camera_name', default_value='camera'),
         DeclareLaunchArgument('log_level', default_value='none'),
-        DeclareLaunchArgument('connection_delay', default_value='100'),
 
         DeclareLaunchArgument('vendor_id', default_value='0x2bc5'),
         DeclareLaunchArgument('product_id', default_value=''),
@@ -25,7 +24,6 @@ def generate_launch_description():
         DeclareLaunchArgument('color_fps', default_value='15'),
         DeclareLaunchArgument('color_format', default_value='MJPG'),
         DeclareLaunchArgument('enable_color', default_value='true'),
-        DeclareLaunchArgument('flip_color', default_value='false'),
         DeclareLaunchArgument('color_qos', default_value='default'),
         DeclareLaunchArgument('color_camera_info_qos', default_value='default'),
         DeclareLaunchArgument('enable_color_auto_exposure', default_value='true'),
@@ -35,7 +33,6 @@ def generate_launch_description():
         DeclareLaunchArgument('depth_fps', default_value='15'),
         DeclareLaunchArgument('depth_format', default_value='Y14'),
         DeclareLaunchArgument('enable_depth', default_value='true'),
-        DeclareLaunchArgument('flip_depth', default_value='false'),
         DeclareLaunchArgument('depth_qos', default_value='default'),
         DeclareLaunchArgument('depth_camera_info_qos', default_value='default'),
 
@@ -44,7 +41,6 @@ def generate_launch_description():
         DeclareLaunchArgument('ir_fps', default_value='15'),
         DeclareLaunchArgument('ir_format', default_value='Y8'),
         DeclareLaunchArgument('enable_ir', default_value='true'),
-        DeclareLaunchArgument('flip_ir', default_value='false'),
         DeclareLaunchArgument('ir_qos', default_value='default'),
         DeclareLaunchArgument('ir_camera_info_qos', default_value='default'),
         DeclareLaunchArgument('enable_ir_auto_exposure', default_value='true'),
@@ -54,10 +50,10 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_colored_point_cloud', default_value='true'),
         DeclareLaunchArgument('point_cloud_qos', default_value='default'),
 
-        DeclareLaunchArgument('enable_accel', default_value='false'),
+        DeclareLaunchArgument('enable_accel', default_value='true'),
         DeclareLaunchArgument('accel_rate', default_value='100hz'),
         DeclareLaunchArgument('accel_range', default_value='4g'),
-        DeclareLaunchArgument('enable_gyro', default_value='false'),
+        DeclareLaunchArgument('enable_gyro', default_value='true'),
         DeclareLaunchArgument('gyro_rate', default_value='100hz'),
         DeclareLaunchArgument('gyro_range', default_value='1000dps'),
 
@@ -70,10 +66,6 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_soft_filter', default_value='true'),
         DeclareLaunchArgument('soft_filter_max_diff', default_value='-1'),
         DeclareLaunchArgument('soft_filter_speckle_size', default_value='-1'),
-        # Depth work mode support is as follows:
-        # Unbinned Dense Default
-        # Unbinned Sparse Default
-        # Binned Sparse Default
         DeclareLaunchArgument('depth_work_mode', default_value=''),
 
         DeclareLaunchArgument('sync_mode', default_value='free_run'),
