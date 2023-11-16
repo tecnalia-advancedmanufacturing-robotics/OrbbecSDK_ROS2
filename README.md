@@ -149,23 +149,23 @@ Orbbec SDK ROS Wrapper supported so many devices, different device has different
 
 | **products**     | **firmware version**             |**launch file**          |**description**                                           |
 | ---              | ---                              | ---                     | ---                                                     |
-| Gemini 2         | 1.4.60 /1.4.76                   | gemini2.launch.py       | [doc](orbbec_camera/launch/gemini2.desc.md )        |
-| Gemini 2 L       | 1.4.32                           | gemini2L.launch.py      | [doc](orbbec_camera/launch/gemini2L.desc.md )       |
-| Gemini 2 XL      | Obox: V1.2.5  VL:1.4.54          | gemini2XL.launch.py     | [doc](orbbec_camera/launch/gemini2XL.desc.md )      |
-| Gemini           | 3.0.18                           | gemini.launch.py        | [doc](orbbec_camera/launch/gemini.desc.md )         |
-| Gemini E         | 3460                             | gemini_e.launch.py      | [doc](orbbec_camera/launch/gemini_e.desc.md )       |
-| Gemini E Lite    | 3606                             | gemini_e_lite.launch.py | [doc](orbbec_camera/launch/gemini_e_lite.desc.md )  |
-| Femto            | 1.6.7                            | femto.launch.py         | [doc](orbbec_camera/launch/femto.desc.md )          |
-| Femto W          | 1.1.8                            | femto.launch.py         | [doc](orbbec_camera/launch/femto.desc.md )          |
-| Femto Bolt       | 1.0.6  (unsupported ARM32)       | femto_bolt.launch.py    | [doc](orbbec_camera/launch/femto_bolt.desc.md )     |
-| Femto Mega       | 1.1.7  (ubuntu20.04,ubuntu22.04) | femto_mega.launch.py    | [doc](orbbec_camera/launch/femto_mega.desc.md )     |
-| Astra+           | 1.0.22/1.0.21/1.0.20/1.0.19      | astra_adv.launch.py     | [doc](orbbec_camera/launch/astra_adv.desc.md )      |
-| Astra Mini Pro   | 1007                             | astra.launch.py         | [doc](orbbec_camera/launch/astra.desc.md )          |
-| Astra Mini S Pro | 1.0.05                           | astra.launch.py         | [doc](orbbec_camera/launch/astra.desc.md )          |
-| Astra 2          | 2.8.20                           | astra2.launch.py        | [doc](orbbec_camera/launch/astra2.desc.md )         |
-| DaBai            | 2436                             | dabai.launch.py         | [doc](orbbec_camera/launch/dabai.desc.md )          |
-| DaBai DW         | 2606                             | dabai_dw.launch.py      | [doc](orbbec_camera/launch/dabai_dw.desc.md )       |
-| DaBai DCW        | 2460                             | dabai_dcw.launch.py     | [doc](orbbec_camera/launch/dabai_dcw.desc.md )      |
+| Gemini 2         | 1.4.60 /1.4.76                   | gemini2.launch.py       | [doc](orbbec_camera/launch/gemini2_desc.md )        |
+| Gemini 2 L       | 1.4.32                           | gemini2L.launch.py      | [doc](orbbec_camera/launch/gemini2L_desc.md )       |
+| Gemini 2 XL      | Obox: V1.2.5  VL:1.4.54          | gemini2XL.launch.py     | [doc](orbbec_camera/launch/gemini2XL_desc.md )      |
+| Gemini           | 3.0.18                           | gemini.launch.py        | [doc](orbbec_camera/launch/gemini_desc.md )         |
+| Gemini E         | 3460                             | gemini_e.launch.py      | [doc](orbbec_camera/launch/gemini_e_desc.md )       |
+| Gemini E Lite    | 3606                             | gemini_e_lite.launch.py | [doc](orbbec_camera/launch/gemini_e_lite_desc.md )  |
+| Femto            | 1.6.7                            | femto.launch.py         | [doc](orbbec_camera/launch/femto_desc.md )          |
+| Femto W          | 1.1.8                            | femto.launch.py         | [doc](orbbec_camera/launch/femto_desc.md )          |
+| Femto Bolt       | 1.0.6  (unsupported ARM32)       | femto_bolt.launch.py    | [doc](orbbec_camera/launch/femto_bolt_desc.md )     |
+| Femto Mega       | 1.1.7  (ubuntu20.04,ubuntu22.04) | femto_mega.launch.py    | [doc](orbbec_camera/launch/femto_mega_desc.md )     |
+| Astra+           | 1.0.22/1.0.21/1.0.20/1.0.19      | astra_adv.launch.py     | [doc](orbbec_camera/launch/astra_adv_desc.md )      |
+| Astra Mini Pro   | 1007                             | astra.launch.py         | [doc](orbbec_camera/launch/astra_desc.md )          |
+| Astra Mini S Pro | 1.0.05                           | astra.launch.py         | [doc](orbbec_camera/launch/astra_desc.md )          |
+| Astra 2          | 2.8.20                           | astra2.launch.py        | [doc](orbbec_camera/launch/astra2_desc.md )         |
+| DaBai            | 2436                             | dabai.launch.py         | [doc](orbbec_camera/launch/dabai_desc.md )          |
+| DaBai DW         | 2606                             | dabai_dw.launch.py      | [doc](orbbec_camera/launch/dabai_dw_desc.md )       |
+| DaBai DCW        | 2460                             | dabai_dcw.launch.py     | [doc](orbbec_camera/launch/dabai_dcw_desc.md )      |
 
 **Note**:
 
