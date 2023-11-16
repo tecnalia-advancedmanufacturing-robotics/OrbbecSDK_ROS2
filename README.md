@@ -88,13 +88,14 @@ eval "$(register-python-argcomplete3 colcon)"
     cd ~/ros2_ws/
     source ./install/setup.bash  # or source ./install/setup.zsh if you are using zsh
     ```
+
 ## 3.Usage
 
-### 3.2 Overview
+### 3.1 Overview
 
 The Orbbec SDK ROS2 Wrapper contains 4 nodes, which are packaged in the `orbbec_camera` package.
 
-#### 3.2.1 start `orbbec_camera_node`
+#### 3.1.1 start `orbbec_camera_node`
 
 This `orbbec_camera_node` is the main node to configure device and get data stream from device. It always need to be launched with a launch file, because it needs to be configured with many parameters, such as image resolution, image format, etc.
 
@@ -118,7 +119,7 @@ After rviz2 is launched, add `/camera/depth/points/PointCloud2` or other topics 
 ![rviz](docs/rviz_add_topics.png)
 
 
-#### 3.2.2 Use Other nodes to get useful information
+#### 3.1.2 Use Other nodes to get useful information
 
 * `list_devices_node`: used to list all connected devices, and print out the information of each device.
 
@@ -141,9 +142,9 @@ After rviz2 is launched, add `/camera/depth/points/PointCloud2` or other topics 
     ros2 run orbbec_camera list_depth_work_mode_node
     ```
 
-### 3.3 The launch file of camera `orbbec_camera_node`
+### 3.2 The launch file of camera `orbbec_camera_node`
 
-#### 3.3.1 Predefined launch files for different devices
+#### 3.2.1 Predefined launch files for different devices
 
 Orbbec SDK ROS Wrapper supported so many devices, different device has different features and limitations. Therefore, writing a launch file that is compatible with all devices can be challenging, and it can be difficult for users to ensure that their launch file is completely accurate. For this reason, we have provide a set of pre-defined launch files for different devices in the `orbbec_camera/launch` directory.
 
@@ -173,14 +174,14 @@ Orbbec SDK ROS Wrapper supported so many devices, different device has different
 2. Read the description document of each device on the right column to get more information about the launch file.
 3. This table is also have listed all currently supported devices and their lowest supported firmware version.
 
-#### 3.3.2 What parameters contained in launch file
+#### 3.2.2 What parameters contained in launch file
 
 For `orbbec_camera_node`, we have provided a set of parameters that can be used to configure the node and the device.
 
 1. All parameters and it's description can be found in [docs/launch_file_parameters.md](docs/launch_file_parameters.md).
 2. As above section says, different devices have different features and limitations. **Please refer to the predefined launch files and its description doc to ensure what parameters can be used and what value can be set for your device.**
 
-### 3.4 Subscribe topics to get image and other data
+### 3.3 Subscribe topics to get image and other data
 
 The published topics differ according to the device and parameters. After running the above command with Gemini 2 attached, the following list of topics will be available (This is a partial list. For full one type `ros2 topic list`):
 
@@ -197,7 +198,7 @@ The published topics differ according to the device and parameters. After runnin
 |imu|`/camera/accel/sample`| The accelerometer sample data.|Gemini2|
 |imu|`/camera/gyro/sample`| The gyroscope sample data.|Gemini2|
 
-### 3.5 Get/Set services on runtime
+### 3.4 Get/Set services on runtime
 
 After the `orbbec_camera_node` launched, you can use services to get/set the camera parameters and control the camera on runtime.
 
@@ -214,7 +215,6 @@ ros2 service list -t | grep camera
 ```
 
 All available services and it's description can be found in [docs/services.md](docs/services.md).
-
 
 ## 4.Advanced usage
 
