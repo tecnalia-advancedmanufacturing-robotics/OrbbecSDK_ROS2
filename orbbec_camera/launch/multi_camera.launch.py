@@ -17,7 +17,6 @@ def generate_launch_description():
         launch_arguments={
             'camera_name': 'camera_01',
             'usb_port': '5-3.4.4.2.1',
-            'device_num': '2',
             'sync_mode': 'free_run'
         }.items()
     )
@@ -29,12 +28,11 @@ def generate_launch_description():
         launch_arguments={
             'camera_name': 'camera_02',
             'usb_port': '5-3.4.3.1',
-            'device_num': '2',
             'sync_mode': 'free_run'
         }.items()
     )
 
-    # If you need more cameras, just add more launch_include here, and change the usb_port and device_num
+    # If you need more cameras, just add more launch_include here, and change the usb_port
 
     # Launch description
     ld = LaunchDescription([

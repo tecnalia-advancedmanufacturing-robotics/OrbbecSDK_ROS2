@@ -137,7 +137,7 @@ class OBCameraNode {
   void clean();
 
   void startStreams();
-  
+
   void startIMU();
 
 
@@ -378,10 +378,8 @@ class OBCameraNode {
   double tf_publish_rate_ = 10.0;
   std::unique_ptr<camera_info_manager::CameraInfoManager> ir_info_manager_ = nullptr;
   std::unique_ptr<camera_info_manager::CameraInfoManager> color_info_manager_ = nullptr;
-  std::string color_info_url_;
-  std::string ir_info_url_;
+
   std::optional<OBCameraParam> camera_param_;
-  bool enable_d2c_viewer_ = false;
   std::unique_ptr<D2CViewer> d2c_viewer_ = nullptr;
   std::map<stream_index_pair, std::atomic_bool> save_images_;
   std::atomic_bool save_point_cloud_{false};

@@ -40,12 +40,6 @@ class OBCameraNodeDriver : public rclcpp::Node {
 
   std::shared_ptr<ob::Device> selectDevice(const std::shared_ptr<ob::DeviceList>& list);
 
-  std::shared_ptr<ob::Device> selectDeviceBySerialNumber(
-      const std::shared_ptr<ob::DeviceList>& list, const std::string& serial_number);
-
-  std::shared_ptr<ob::Device> selectDeviceByUSBPort(const std::shared_ptr<ob::DeviceList>& list,
-                                                    const std::string& usb_port);
-
   void initializeDevice(const std::shared_ptr<ob::Device>& device);
 
   void startDevice(const std::shared_ptr<ob::DeviceList>& list);
@@ -64,7 +58,7 @@ class OBCameraNodeDriver : public rclcpp::Node {
 
   void resetDevice();
 
- private:
+private:
   std::string config_path_;
   std::unique_ptr<ob::Context> ctx_ = nullptr;
   rclcpp::Logger logger_;
@@ -73,14 +67,11 @@ class OBCameraNodeDriver : public rclcpp::Node {
   std::shared_ptr<ob::DeviceInfo> device_info_ = nullptr;
   std::atomic_bool is_alive_{false};
   std::atomic_bool device_connected_{false};
-  std::string serial_number_;
-  std::string device_unique_id_;
-  std::string usb_port_;
   std::shared_ptr<Parameters> parameters_ = nullptr;
   std::shared_ptr<std::thread> query_thread_ = nullptr;
   std::shared_ptr<std::thread> device_count_update_thread_ = nullptr;
   std::recursive_mutex device_lock_;
-  int device_num_ = 1;
+  std::string device_unique_id_;
   rclcpp::TimerBase::SharedPtr check_connect_timer_ = nullptr;
   std::shared_ptr<std::thread> sync_time_thread_ = nullptr;
   std::shared_ptr<std::thread> reset_device_thread_ = nullptr;
@@ -92,5 +83,11 @@ class OBCameraNodeDriver : public rclcpp::Node {
   pthread_mutexattr_t orb_device_lock_attr_;
   uint8_t* orb_device_lock_shm_addr_ = nullptr;
   int orb_device_lock_shm_fd_ = -1;
+
+private:
+    uint16_t vendor_id_;
+    uint16_t product_id_;
+    std::string serial_number_;
+    std::string usb_port_;
 };
 }  // namespace orbbec_camera

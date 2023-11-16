@@ -57,11 +57,11 @@ OBCameraNode::OBCameraNode(rclcpp::Node *node, std::shared_ptr<ob::Device> devic
 #elif defined(USE_NV_HW_DECODER)
   jpeg_decoder_ = std::make_unique<JetsonNvJPEGDecoder>(width_[COLOR], height_[COLOR]);
 #endif
-  if (enable_d2c_viewer_) {
-    auto rgb_qos = getRMWQosProfileFromString(image_qos_[COLOR]);
-    auto depth_qos = getRMWQosProfileFromString(image_qos_[DEPTH]);
-    d2c_viewer_ = std::make_unique<D2CViewer>(node_, rgb_qos, depth_qos);
-  }
+//   if (enable_d2c_viewer_) {
+//     auto rgb_qos = getRMWQosProfileFromString(image_qos_[COLOR]);
+//     auto depth_qos = getRMWQosProfileFromString(image_qos_[DEPTH]);
+//     d2c_viewer_ = std::make_unique<D2CViewer>(node_, rgb_qos, depth_qos);
+//   }
   if (enable_stream_[COLOR]) {
     rgb_buffer_ = new uint8_t[width_[COLOR] * height_[COLOR] * 3];
   }
@@ -422,12 +422,9 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter(tf_publish_rate_, "tf_publish_rate", 10.0);
   setAndGetNodeParameter(depth_registration_, "depth_registration", false);
   setAndGetNodeParameter(enable_point_cloud_, "enable_point_cloud", true);
-  setAndGetNodeParameter<std::string>(ir_info_url_, "ir_info_url", "");
-  setAndGetNodeParameter<std::string>(color_info_url_, "color_info_url", "");
   setAndGetNodeParameter(enable_colored_point_cloud_, "enable_colored_point_cloud", false);
   setAndGetNodeParameter(enable_point_cloud_, "enable_point_cloud", true);
   setAndGetNodeParameter<std::string>(point_cloud_qos_, "point_cloud_qos", "default");
-  setAndGetNodeParameter(enable_d2c_viewer_, "enable_d2c_viewer", false);
   setAndGetNodeParameter(enable_hardware_d2d_, "enable_hardware_d2d", true);
   setAndGetNodeParameter(enable_soft_filter_, "enable_soft_filter", true);
   setAndGetNodeParameter(enable_frame_sync_, "enable_frame_sync", false);
@@ -450,8 +447,8 @@ void OBCameraNode::getParameters() {
   setAndGetNodeParameter<bool>(enable_ldp_, "enable_ldp", true);
   setAndGetNodeParameter<int>(soft_filter_max_diff_, "soft_filter_max_diff", -1);
   setAndGetNodeParameter<int>(soft_filter_speckle_size_, "soft_filter_speckle_size", -1);
-  setAndGetNodeParameter<double>(liner_accel_cov_, "linear_accel_cov", 0.0003);
-  setAndGetNodeParameter<double>(angular_vel_cov_, "angular_vel_cov", 0.02);
+  setAndGetNodeParameter<double>(liner_accel_cov_, "linear_accel_cov", 0.0001);
+  setAndGetNodeParameter<double>(angular_vel_cov_, "angular_vel_cov", 0.0001);
 }
 
 void OBCameraNode::setupTopics() {

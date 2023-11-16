@@ -16,7 +16,6 @@ def generate_launch_description():
 
         DeclareLaunchArgument('vendor_id', default_value='0x2bc5'),
         DeclareLaunchArgument('product_id', default_value=''),
-        DeclareLaunchArgument('device_num', default_value='1'),
         DeclareLaunchArgument('serial_number', default_value=''),
         DeclareLaunchArgument('usb_port', default_value=''),
 

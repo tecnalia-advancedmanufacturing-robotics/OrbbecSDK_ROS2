@@ -24,6 +24,13 @@
 #include <sys/mman.h>
 
 namespace orbbec_camera {
+
+std::string to_hex_string(uint32_t value){
+    std::stringstream stream;
+    stream <<  "0x"<< std::hex << value;
+    return stream.str();
+}
+
 OBCameraNodeDriver::OBCameraNodeDriver(const rclcpp::NodeOptions &node_options)
     : Node("orbbec_camera_node", "/", node_options),
       config_path_(ament_index_cpp::get_package_share_directory("orbbec_camera") +
@@ -84,10 +91,29 @@ void OBCameraNodeDriver::init() {
   orb_device_lock_ = (pthread_mutex_t *)orb_device_lock_shm_addr_;
   pthread_mutex_init(orb_device_lock_, &orb_device_lock_attr_);
   is_alive_.store(true);
+
+// load parameters
   parameters_ = std::make_shared<Parameters>(this);
+  try{
+    vendor_id_ = static_cast<int>(declare_parameter<int>("vendor_id", 0));
+  }catch(...){
+    vendor_id_ = 0x2bc5;
+  }
+  try{
+    product_id_ = static_cast<int>(declare_parameter<int>("product_id", 0));
+  }catch(...){
+    product_id_ = 0;
+  }
   serial_number_ = declare_parameter<std::string>("serial_number", "");
-  device_num_ = static_cast<int>(declare_parameter<int>("device_num", 1));
   usb_port_ = declare_parameter<std::string>("usb_port", "");
+  RCLCPP_INFO_STREAM(logger_, "Try to connect device:"
+                                  << "{ vendor_id: " << (vendor_id_>0? to_hex_string(vendor_id_) : "<ANY>")
+                                  << ", product_id: " << (product_id_>0? to_hex_string(product_id_) : "<ANY>")
+                                  << ", serial_number: " << (serial_number_.length() > 0? serial_number_ : "<ANY>")
+                                  << ", usb_port: " << (usb_port_.length() > 0? usb_port_ : "<ANY>")
+                                  << " }"
+                    );
+
   auto enumerate_net_device_ = declare_parameter<bool>("enumerate_net_device", "false");
   ctx_->enableNetDeviceEnumeration(enumerate_net_device_);
   ctx_->setDeviceChangedCallback([this](const std::shared_ptr<ob::DeviceList> &removed_list,
@@ -95,6 +121,8 @@ void OBCameraNodeDriver::init() {
     onDeviceConnected(added_list);
     onDeviceDisconnected(removed_list);
   });
+
+
   check_connect_timer_ =
       this->create_wall_timer(std::chrono::milliseconds(1000), [this]() { checkConnectTimer(); });
   CHECK_NOTNULL(check_connect_timer_);
@@ -206,85 +234,34 @@ void OBCameraNodeDriver::resetDevice() {
 
 std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDevice(
     const std::shared_ptr<ob::DeviceList> &list) {
-  if (device_num_ == 1) {
-    RCLCPP_INFO_STREAM(logger_, "Connecting to the default device");
-    return list->getDevice(0);
-  }
+  auto lower_sn = serial_number_;
+  std::transform(lower_sn.begin(), lower_sn.end(), lower_sn.begin(), ::tolower);
 
-  std::shared_ptr<ob::Device> device = nullptr;
-  if (!serial_number_.empty()) {
-    RCLCPP_INFO_STREAM(logger_, "Connecting to device with serial number: " << serial_number_);
-    device = selectDeviceBySerialNumber(list, serial_number_);
-  } else if (!usb_port_.empty()) {
-    RCLCPP_INFO_STREAM(logger_, "Connecting to device with usb port: " << usb_port_);
-    device = selectDeviceByUSBPort(list, usb_port_);
-  }
-  if (device == nullptr) {
-    RCLCPP_WARN_THROTTLE(logger_, *get_clock(), 1000, "Device with serial number %s not found",
-                         serial_number_.c_str());
-    device_connected_ = false;
-    return nullptr;
-  }
-  return device;
-}
-
-std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceBySerialNumber(
-    const std::shared_ptr<ob::DeviceList> &list, const std::string &serial_number) {
-  std::string lower_sn;
-  std::transform(serial_number.begin(), serial_number.end(), std::back_inserter(lower_sn),
-                 [](auto ch) { return isalpha(ch) ? tolower(ch) : static_cast<int>(ch); });
-  for (size_t i = 0; i < list->deviceCount(); i++) {
-    RCLCPP_INFO_STREAM(logger_, "Before lock: Select device serial number: " << serial_number);
+  auto dev_cnt = list->deviceCount();
+  for (size_t i = 0; i < dev_cnt; i++) {
     std::lock_guard<decltype(device_lock_)> lock(device_lock_);
-    RCLCPP_INFO_STREAM(logger_, "After lock: Select device serial number: " << serial_number);
-    try {
-      auto pid = list->pid(i);
-      if (isOpenNIDevice(pid)) {
-        // openNI device
-        auto device = list->getDevice(i);
-        auto device_info = device->getDeviceInfo();
-        if (device_info->serialNumber() == serial_number) {
-          RCLCPP_INFO_STREAM(logger_,
-                             "Device serial number " << device_info->serialNumber() << " matched");
-          return device;
-        }
-      } else {
-        std::string sn = list->serialNumber(i);
-        RCLCPP_INFO_STREAM_THROTTLE(logger_, *get_clock(), 1000, "Device serial number: " << sn);
-        if (sn == serial_number) {
-          RCLCPP_INFO_STREAM(logger_, "Device serial number " << sn << " matched");
-          return list->getDevice(i);
-        }
-      }
-    } catch (ob::Error &e) {
-      RCLCPP_ERROR_STREAM_THROTTLE(logger_, *get_clock(), 1000,
-                                   "Failed to get device info " << e.getMessage());
-    } catch (std::exception &e) {
-      RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.what());
-    } catch (...) {
-      RCLCPP_ERROR_STREAM(logger_, "Failed to get device info");
+    uint16_t pid = list->pid(i);
+    if(product_id_ !=0 && pid!= product_id_){
+        continue;
     }
-  }
-  return nullptr;
-}
 
-std::shared_ptr<ob::Device> OBCameraNodeDriver::selectDeviceByUSBPort(
-    const std::shared_ptr<ob::DeviceList> &list, const std::string &usb_port) {
-  try {
-    RCLCPP_INFO_STREAM(logger_, "Before lock: Select device usb port: " << usb_port);
-    std::lock_guard<decltype(device_lock_)> lock(device_lock_);
-    RCLCPP_INFO_STREAM(logger_, "After lock: Select device usb port: " << usb_port);
-    auto device = list->getDeviceByUid(usb_port.c_str());
-    RCLCPP_INFO_STREAM(logger_, "Device usb port " << usb_port << " done");
-    return device;
-  } catch (ob::Error &e) {
-    RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.getMessage());
-  } catch (std::exception &e) {
-    RCLCPP_ERROR_STREAM(logger_, "Failed to get device info " << e.what());
-  } catch (...) {
-    RCLCPP_ERROR_STREAM(logger_, "Failed to get device info");
-  }
+    if (!lower_sn.empty()) {
+        std::string serial_number = list->serialNumber(i);
+        std::transform(serial_number.begin(), serial_number.end(), serial_number.begin(), ::tolower);
+        if(serial_number.find(lower_sn) == std::string::npos){
+            continue;
+        }
+    }
 
+    if(!usb_port_.empty()){
+        std::string uid = list->uid(i);
+        std::transform(uid.begin(), uid.end(), uid.begin(), ::tolower);
+        if(uid.substr(0, usb_port_.size()) != usb_port_){
+            continue;
+        }
+    }
+    return list->getDevice(i);
+  }
   return nullptr;
 }
 
@@ -318,7 +295,7 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
     return;
   }
   if (list->deviceCount() == 0) {
-    RCLCPP_WARN(logger_, "No device found");
+    RCLCPP_WARN(logger_, "No device found, please connected your device to current host");
     return;
   }
   if (device_) {
@@ -331,8 +308,13 @@ void OBCameraNodeDriver::startDevice(const std::shared_ptr<ob::DeviceList> &list
   try {
     auto device = selectDevice(list);
     if (device == nullptr) {
-      RCLCPP_WARN_THROTTLE(logger_, *get_clock(), 1000, "Device with serial number %s not found",
-                           serial_number_.c_str());
+        RCLCPP_WARN_STREAM_THROTTLE(logger_, *get_clock(), 1000, "No required device found, please make sure you launch file configuration is correct! required device: "
+                                  << "{ vendor_id: " << (vendor_id_>0? to_hex_string(vendor_id_) : "<ANY>")
+                                  << ", product_id: " << (product_id_>0? to_hex_string(product_id_) : "<ANY>")
+                                  << ", serial_number: " << (serial_number_.length() > 0? serial_number_ : "<ANY>")
+                                  << ", usb_port: " << (usb_port_.length() > 0? usb_port_ : "<ANY>")
+                                  << " }"
+                    );
       device_connected_ = false;
       return;
     }
