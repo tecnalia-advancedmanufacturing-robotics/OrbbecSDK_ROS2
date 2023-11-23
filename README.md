@@ -13,7 +13,8 @@
     - [3.2 The launch file of camera `orbbec_camera_node`](#32-the-launch-file-of-camera-orbbec_camera_node)
       - [3.2.1 Predefined launch files for different devices](#321-predefined-launch-files-for-different-devices)
       - [3.2.2 What parameters contained in launch file](#322-what-parameters-contained-in-launch-file)
-      - [3.2.3 How to use the launch file](#323-how-to-use-the-launch-file)
+    - [3.3 Subscribe topics to get image and other data](#33-subscribe-topics-to-get-image-and-other-data)
+    - [3.4 Get/Set services on runtime](#34-getset-services-on-runtime)
   - [4.Advanced usage](#4advanced-usage)
     - [4.1 Multiple devices](#41-multiple-devices)
     - [4.2 Use hardware decoder to decode JPEG](#42-use-hardware-decoder-to-decode-jpeg)
@@ -207,12 +208,6 @@ For `orbbec_camera_node`, we have provided a set of parameters that can be used 
 
 1. All parameters and it's description can be found in [docs/launch_file_parameters.md](docs/launch_file_parameters.md).
 2. As above section says, different devices have different features and limitations. **Please refer to the predefined launch files and its description doc to ensure what parameters can be used and what value can be set for your device.**
-
-#### 3.2.3 How to use the launch file
-
-After you have chosen the launch file that is compatible with your device, you can use it to launch the camera node.
-
-``` bash
 
 ### 3.3 Subscribe topics to get image and other data
 
