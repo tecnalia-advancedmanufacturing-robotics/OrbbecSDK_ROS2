@@ -17,6 +17,8 @@ ros2 launch orbbec_camera gemini2.launch.py
 
 We have list all supported parameters here, but different device may have different supported parameters. If you want modify the predefined launch file, or create a new launch file for your device, **please refer to the predefined launch file and the description doc of you device to ensure what parameters can be used and what value can be set.**
 
+>For example: the description of Orbbec Gemini 2 device is [here: orbbec_camera/launch/gemini2_desc.md](../orbbec_camera/launch/gemini2_desc.md).
+
 ### 2.1 Global parameters
 
 1. `camera_name`
@@ -92,19 +94,19 @@ ROS2 Message quality of service of the point cloud.
 Enables the accelerometer.
 
 2. `accel_rate`
-The sample rate of the accelerometer, unit: Hz. The optional values are 1.5625hz,3.125hz,6.25hz,12.5hz,25hz,50hz, 100hz,200hz,500hz,1khz,2khz,4khz,8khz,16khz,32khz. The specific value depends on the current camera.
+The sample rate of the accelerometer, unit: Hz. The specific value depends on the current camera.
 
 3. `accel_range`
-The measuring range of the accelerometer, the optional values are 2g,4g,8g,16g. The specific value depends on the current camera.
+The measuring range of the accelerometer. The specific value depends on the current camera.
 
 4. `enable_gyro`
 Enables the gyroscope.
 
 5. `gyro_rate`
-The sample rate of the gyroscope, unit: Hz. The optional values are 1.5625hz,3.125hz,6.25hz,12.5hz,25hz,50hz, 100hz,200hz,500hz,1khz,2khz,4khz,8khz,16khz,32khz. The specific value
+The sample rate of the gyroscope, unit: Hz. The specific value
 
 6. `gyro_range`
-The measuring range of the gyroscope, the optional values are 250dps,500dps,1000dps,2000dps. The specific value depends on the current camera.
+The measuring range of the gyroscope. The specific value depends on the current camera.
 
 ### 2.6 Multiple device synchronization parameters
 

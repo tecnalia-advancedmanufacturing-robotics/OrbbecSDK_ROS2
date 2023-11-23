@@ -216,7 +216,7 @@ The service to set the auto exposure of depth camera.
 The service to get and set the exposure of depth camera.
   * service type: `orbbec_camera_msgs/srv/SetInt32` and `orbbec_camera_msgs/srv/GetInt32`
   * minium value: 200
-  * maximum value: 500
+  * maximum value: 5000
   * default value:
   * step: 1
 
@@ -237,7 +237,7 @@ The service to set the auto exposure of infrared camera.
 The service to get and set the exposure of infrared camera.
   * service type: `orbbec_camera_msgs/srv/SetInt32` and `orbbec_camera_msgs/srv/GetInt32`
   * minium value: 200
-  * maximum value: 500
+  * maximum value: 5000
   * default value:
   * step: 1
 

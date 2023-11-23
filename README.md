@@ -1,5 +1,30 @@
 # Orbbec SDK ROS2 Wrapper
 
+- [Orbbec SDK ROS2 Wrapper](#orbbec-sdk-ros2-wrapper)
+  - [1.ROS1 And ROS2](#1ros1-and-ros2)
+  - [2.Installation](#2installation)
+    - [2.1 Step 1: Install the ROS2 distribution](#21-step-1-install-the-ros2-distribution)
+    - [2.2 Step 2: Install dependencies](#22-step-2-install-dependencies)
+    - [2.3 Step 3: Install the Orbbec SDK ROS2 Wrapper](#23-step-3-install-the-orbbec-sdk-ros2-wrapper)
+  - [3.Usage](#3usage)
+    - [3.1 Overview](#31-overview)
+      - [3.1.1 start `orbbec_camera_node`](#311-start-orbbec_camera_node)
+      - [3.1.2 Use Other nodes to get useful information](#312-use-other-nodes-to-get-useful-information)
+    - [3.2 The launch file of camera `orbbec_camera_node`](#32-the-launch-file-of-camera-orbbec_camera_node)
+      - [3.2.1 Predefined launch files for different devices](#321-predefined-launch-files-for-different-devices)
+      - [3.2.2 What parameters contained in launch file](#322-what-parameters-contained-in-launch-file)
+      - [3.2.3 How to use the launch file](#323-how-to-use-the-launch-file)
+  - [4.Advanced usage](#4advanced-usage)
+    - [4.1 Multiple devices](#41-multiple-devices)
+    - [4.2 Use hardware decoder to decode JPEG](#42-use-hardware-decoder-to-decode-jpeg)
+      - [4.2.1 rockchip and Amlogic](#421-rockchip-and-amlogic)
+      - [4.2.2 Nvidia Jetson](#422-nvidia-jetson)
+    - [4.3 Depth work mode switch](#43-depth-work-mode-switch)
+    - [4.4 Configuration of depth NFOV and WFOV modes](#44-configuration-of-depth-nfov-and-wfov-modes)
+    - [4.5 DDS Tuning](#45-dds-tuning)
+  - [5. Frequently Asked Questions](#5-frequently-asked-questions)
+  - [6. License](#6-license)
+
 ## 1.ROS1 And ROS2
 
 The Orbbec SDK ROS2 Wrapper is a ROS2 wrapper for the [Orbbec SDK](https://github.com/orbbec/OrbbecSDK). It provides a ROS2 interface for the Orbbec 3D camera, and is compatible with the ROS2 Foxy, Galactic, and Humble distributions.
@@ -12,10 +37,10 @@ The Orbbec SDK ROS2 Wrapper is a ROS2 wrapper for the [Orbbec SDK](https://githu
 
 Please refer to the official guide:
 
-* [Ubuntu (Debian): Foxy](https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Debians.html)
-* [Ubuntu (Debian): Galactic](https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html)
-* [Ubuntu (Debian): Humble](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)
-* More guides for other ROS2 distributions and operating systems can be found [here](https://docs.ros.org/).
+- [Ubuntu (Debian): Foxy](https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Debians.html)
+- [Ubuntu (Debian): Galactic](https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html)
+- [Ubuntu (Debian): Humble](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)
+- More guides for other ROS2 distributions and operating systems can be found [here](https://docs.ros.org/).
 
 After installing ROS2, don't forget to source the environment: [Configuring-ROS2-Environment](https://index.ros.org/doc/ros2/Tutorials/Configuring-ROS2-Environment/)
 
@@ -28,9 +53,9 @@ eval "$(register-python-argcomplete3 colcon)"
 
 ### 2.2 Step 2: Install dependencies
 
-* Install dependent ROS2 packages
+- Install dependent ROS2 packages
 
-  * Install ROS packages by:
+  - Install ROS packages by:
 
     ```bash
     sudo apt install ros-$ROS_DISTRO-image-transport \
@@ -38,7 +63,7 @@ eval "$(register-python-argcomplete3 colcon)"
     ros-$ROS_DISTRO-camera-info-manager
     ```
 
-  * For example, for Humble distro:
+  - For example, for Humble distro:
 
     ```bash
     sudo apt install ros-humble-image-transport \
@@ -46,7 +71,7 @@ eval "$(register-python-argcomplete3 colcon)"
     ros-humble-camera-info-manager
     ```
 
-* Install dependent libraries
+- Install dependent libraries
 
     ```bash
     sudo apt install libgflags-dev nlohmann-json3-dev libgoogle-glog-dev
@@ -54,27 +79,27 @@ eval "$(register-python-argcomplete3 colcon)"
 
 ### 2.3 Step 3: Install the Orbbec SDK ROS2 Wrapper
 
-* Create a ROS2 workspace
+- Create a ROS2 workspace
 
     ```bash
     mkdir -p ~/ros2_ws/src # you can replace `~/ros2_ws` with your own workspace path
     ```
 
-* Clone the latest OrbbecSDK ROS2 wrapper from [here](ttps://github.com/orbbec/OrbbecSDK_ROS2.git) into `~/ros2_ws/src/`
+- Clone the latest OrbbecSDK ROS2 wrapper from [here](https://github.com/orbbec/OrbbecSDK_ROS2.git) into `~/ros2_ws/src/`
 
     ```bash
     cd ~/ros2_ws/src
     git clone https://github.com/orbbec/OrbbecSDK_ROS2.git
     ```
 
-* Build
+- Build
 
     ```bash
     cd ~/ros2_ws/
     colcon build --event-handlers  console_direct+  --cmake-args -DCMAKE_BUILD_TYPE=Release
     ```
 
-* Install udev rules file to get usb device access permission
+- Install udev rules file to get usb device access permission
 
     ``` bash
     cd  ~/ros2_ws/src/OrbbecSDK_ROS2/orbbec_camera/scripts
@@ -82,7 +107,7 @@ eval "$(register-python-argcomplete3 colcon)"
     sudo udevadm control --reload-rules && sudo udevadm trigger
     ```
 
-* source environment (**do this every time you open a new terminal**)
+- source environment (**do this every time you open a new terminal**)
 
     ``` bash
     cd ~/ros2_ws/
@@ -99,7 +124,9 @@ The Orbbec SDK ROS2 Wrapper contains 4 nodes, which are packaged in the `orbbec_
 
 This `orbbec_camera_node` is the main node to configure device and get data stream from device. It always need to be launched with a launch file, because it needs to be configured with many parameters, such as image resolution, image format, etc.
 
-* Launch camera node
+> Read [section 3.2](#32-the-launch-file-of-camera-orbbec_camera_node) for more details about launch file
+
+- Launch camera node
 
     ```bash
     # On terminal 1
@@ -107,7 +134,7 @@ This `orbbec_camera_node` is the main node to configure device and get data stre
     ros2 launch orbbec_camera gemini2.launch.py
     ```
 
-* Launch rviz2 to view stream
+- Launch rviz2 to view stream
 
     ```bash
     # On terminal 2
@@ -121,21 +148,21 @@ After rviz2 is launched, add `/camera/depth/points/PointCloud2` or other topics 
 
 #### 3.1.2 Use Other nodes to get useful information
 
-* `list_devices_node`: used to list all connected devices, and print out the information of each device.
+- `list_devices_node`: used to list all connected devices, and print out the information of each device.
 
     ``` bash
     # make should you device has been connected and has not been open by other node before run this.
     ros2 run orbbec_camera list_devices_node
     ```
 
-* `list_camera_profile_mode_node`: used to list all supported camera and profile (resolution, frame rate, image format) of the default device (the first device enumerated).
+- `list_camera_profile_mode_node`: used to list all supported camera and profile (resolution, frame rate, image format) of the default device (the first device enumerated).
 
     ``` bash
     # make should you device has been connected and has not been open by other node before run this.
     ros2 run orbbec_camera list_camera_profile_mode_node
     ```
 
-* `list_depth_work_mode_node`: For some models (Gemini 2, Gemini 2 L and Gemini 2 XL), there are multiple depth work modes. This node is used to list all supported depth work mode for default device (the first device enumerated).
+- `list_depth_work_mode_node`: For some models (Gemini 2, Gemini 2 L and Gemini 2 XL), there are multiple depth work modes. This node is used to list all supported depth work mode for default device (the first device enumerated).
 
     ``` bash
     # make should you device has been connected and has not been open by other node before run this.
@@ -150,23 +177,23 @@ Orbbec SDK ROS Wrapper supported so many devices, different device has different
 
 | **products**     | **firmware version**             |**launch file**          |**description**                                           |
 | ---              | ---                              | ---                     | ---                                                     |
-| Gemini 2         | 1.4.60 /1.4.76                   | gemini2.launch.py       | [doc](orbbec_camera/launch/gemini2_desc )        |
-| Gemini 2 L       | 1.4.32                           | gemini2L.launch.py      | [doc](orbbec_camera/launch/gemini2L_desc.md )       |
-| Gemini 2 XL      | Obox: V1.2.5  VL:1.4.54          | gemini2XL.launch.py     | [doc](orbbec_camera/launch/gemini2XL_desc.md )      |
-| Gemini           | 3.0.18                           | gemini.launch.py        | [doc](orbbec_camera/launch/gemini_desc.md )         |
-| Gemini E         | 3460                             | gemini_e.launch.py      | [doc](orbbec_camera/launch/gemini_e_desc.md )       |
-| Gemini E Lite    | 3606                             | gemini_e_lite.launch.py | [doc](orbbec_camera/launch/gemini_e_lite_desc.md )  |
-| Femto            | 1.6.7                            | femto.launch.py         | [doc](orbbec_camera/launch/femto_desc.md )          |
-| Femto W          | 1.1.8                            | femto.launch.py         | [doc](orbbec_camera/launch/femto_desc.md )          |
-| Femto Bolt       | 1.0.6  (unsupported ARM32)       | femto_bolt.launch.py    | [doc](orbbec_camera/launch/femto_bolt_desc.md )     |
-| Femto Mega       | 1.1.7  (ubuntu20.04,ubuntu22.04) | femto_mega.launch.py    | [doc](orbbec_camera/launch/femto_mega_desc.md )     |
-| Astra+           | 1.0.22/1.0.21/1.0.20/1.0.19      | astra_adv.launch.py     | [doc](orbbec_camera/launch/astra_adv_desc.md )      |
-| Astra Mini Pro   | 1007                             | astra.launch.py         | [doc](orbbec_camera/launch/astra_desc.md )          |
-| Astra Mini S Pro | 1.0.05                           | astra.launch.py         | [doc](orbbec_camera/launch/astra_desc.md )          |
-| Astra 2          | 2.8.20                           | astra2.launch.py        | [doc](orbbec_camera/launch/astra2_desc.md )         |
-| DaBai            | 2436                             | dabai.launch.py         | [doc](orbbec_camera/launch/dabai_desc.md )          |
-| DaBai DW         | 2606                             | dabai_dw.launch.py      | [doc](orbbec_camera/launch/dabai_dw_desc.md )       |
-| DaBai DCW        | 2460                             | dabai_dcw.launch.py     | [doc](orbbec_camera/launch/dabai_dcw_desc.md )      |
+| Gemini 2         | 1.4.60 /1.4.76                   | gemini2.launch.py       | [doc](orbbec_camera/launch/gemini2_desc)        |
+| Gemini 2 L       | 1.4.32                           | gemini2L.launch.py      | [doc](orbbec_camera/launch/gemini2L_desc.md)       |
+| Gemini 2 XL      | Obox: V1.2.5  VL:1.4.54          | gemini2XL.launch.py     | [doc](orbbec_camera/launch/gemini2XL_desc.md)      |
+| Gemini           | 3.0.18                           | gemini.launch.py        | [doc](orbbec_camera/launch/gemini_desc.md)         |
+| Gemini E         | 3460                             | gemini_e.launch.py      | [doc](orbbec_camera/launch/gemini_e_desc.md)       |
+| Gemini E Lite    | 3606                             | gemini_e_lite.launch.py | [doc](orbbec_camera/launch/gemini_e_lite_desc.md)  |
+| Femto            | 1.6.7                            | femto.launch.py         | [doc](orbbec_camera/launch/femto_desc.md)          |
+| Femto W          | 1.1.8                            | femto.launch.py         | [doc](orbbec_camera/launch/femto_desc.md)          |
+| Femto Bolt       | 1.0.6  (unsupported ARM32)       | femto_bolt.launch.py    | [doc](orbbec_camera/launch/femto_bolt_desc.md)     |
+| Femto Mega       | 1.1.7  (ubuntu20.04,ubuntu22.04) | femto_mega.launch.py    | [doc](orbbec_camera/launch/femto_mega_desc.md)     |
+| Astra+           | 1.0.22/1.0.21/1.0.20/1.0.19      | astra_adv.launch.py     | [doc](orbbec_camera/launch/astra_adv_desc.md)      |
+| Astra Mini Pro   | 1007                             | astra.launch.py         | [doc](orbbec_camera/launch/astra_desc.md)          |
+| Astra Mini S Pro | 1.0.05                           | astra.launch.py         | [doc](orbbec_camera/launch/astra_desc.md)          |
+| Astra 2          | 2.8.20                           | astra2.launch.py        | [doc](orbbec_camera/launch/astra2_desc.md)         |
+| DaBai            | 2436                             | dabai.launch.py         | [doc](orbbec_camera/launch/dabai_desc.md)          |
+| DaBai DW         | 2606                             | dabai_dw.launch.py      | [doc](orbbec_camera/launch/dabai_dw_desc.md)       |
+| DaBai DCW        | 2460                             | dabai_dcw.launch.py     | [doc](orbbec_camera/launch/dabai_dcw_desc.md)      |
 
 **Note**:
 
@@ -180,6 +207,12 @@ For `orbbec_camera_node`, we have provided a set of parameters that can be used 
 
 1. All parameters and it's description can be found in [docs/launch_file_parameters.md](docs/launch_file_parameters.md).
 2. As above section says, different devices have different features and limitations. **Please refer to the predefined launch files and its description doc to ensure what parameters can be used and what value can be set for your device.**
+
+#### 3.2.3 How to use the launch file
+
+After you have chosen the launch file that is compatible with your device, you can use it to launch the camera node.
+
+``` bash
 
 ### 3.3 Subscribe topics to get image and other data
 
@@ -214,7 +247,7 @@ ros2 service call /camera/set_color_exposure orbbec_camera_msgs/srv/SetInt32 '{d
 ros2 service list -t | grep camera
 ```
 
-All available services and it's description can be found in [docs/services.md](docs/services.md).
+All available services and it's description can be found in [docs/services.md](docs/services_description.md).
 
 ## 4.Advanced usage
 
@@ -237,24 +270,22 @@ Open `CMakeLists.txt` and set `USE_NV_HW_DECODER` to `ON`.
 
 ### 4.3 Depth work mode switch
 
-* The depth work mode switch is supported by Gemini 2, Gemini 2 L, and Gemini 2 XL cameras.
-* Before starting the camera, depth work mode (depth_work_mode) can be configured for the corresponding xxx.launch.py file's support.
-* The default depth work mode configuration of xxx.launch.py is the camera's default configuration. If you need to modify it, you can switch to the corresponding mode as needed.
-* The specific camera depth work mode support types can be found in the comments of the depth mode.
+- The depth work mode switch is supported by Gemini 2, Gemini 2 L, and Gemini 2 XL cameras.
+- Before starting the camera, depth work mode (depth_work_mode) can be configured for the corresponding xxx.launch.py file's support.
+- The default depth work mode configuration of xxx.launch.py is the camera's default configuration. If you need to modify it, you can switch to the corresponding mode as needed:
 
-```python
-    # Depth work mode support is as follows:
-    # Unbinned Dense Default
-    # Unbinned Sparse Default
-    # Binned Sparse Default
-    DeclareLaunchArgument('depth_work_mode', default_value='')
-```
+  ```python
+  # on xxx.launch.py file:
+  DeclareLaunchArgument('depth_work_mode', default_value='')
+  ```
 
-* View depth work modes:
+- The specific camera depth work mode support types can be found in the comments of the depth mode.
 
-```bash
-ros2 run orbbec_camera list_depth_work_mode_node
-```
+- View depth work modes:
+
+  ```bash
+  ros2 run orbbec_camera list_depth_work_mode_node
+  ```
 
 ### 4.4 Configuration of depth NFOV and WFOV modes
 
@@ -262,10 +293,10 @@ For the Femto Mega and Femto Bolt devices, the NFOV and WFOV modes are implement
 In launch file, depth_width、depth_height、ir_width、ir_height represents the resolution of the depth  and the resolution of the IR.
 The frame fps and resolution of IR must be consistent with the depth. The correspondence between different modes and resolutions is as follows:
 
-* NFOV unbinned: 640 x 576.
-* NFOV binned: 320 x 288.
-* WFOV unbinned: 1024 x 1024.
-* WFOV binned: 512 x 512.
+- NFOV unbinned: 640 x 576.
+- NFOV binned: 320 x 288.
+- WFOV unbinned: 1024 x 1024.
+- WFOV binned: 512 x 512.
 
 ### 4.5 DDS Tuning
 
@@ -275,13 +306,13 @@ Please refer to [docs/dds_tuning.md](docs/dds_tuning.md) to optimize the DDS set
 
 ## 5. Frequently Asked Questions
 
-* It's possible that the power supply is insufficient.
+- It's possible that the power supply is insufficient.
   To avoid this, do not connect all cameras to the same hub and use a powered hub instead.
 
-* It's also possible that the resolution is too high.
+- It's also possible that the resolution is too high.
   To resolve this, try lowering the resolution.
 
-* Why are there so many launch files here?
+- Why are there so many launch files here?
     The reason for the presence of multiple launch files is due to the fact that the default resolutions and image formats of different cameras vary.To make it easier to use, the launch files have been separated for each camera.
 
 ## 6. License

@@ -5,6 +5,7 @@ This document describes the services of `orbbec_camera_node`. Before using those
 ## Services
 
 We have list all the services of `orbbec_camera_node` here. But different devices may have different services supported. Please refer to the description of the device you are using, witch can be found in the `orbbec_camera/launch` directory.
+>For example: the description of Orbbec Gemini 2 device is [here: orbbec_camera/launch/gemini2_desc.md](../orbbec_camera/launch/gemini2_desc.md).
 
 The name of the following service already expresses its function. However, it should be noted that the corresponding `set_[ir|depth|color]_xxx` and `get_[ir|depth|color]_xxx` **services are only available if you set** `enable[ir|depth|color]` to `true` in the stream that corresponds to the argument of the launch file.
 
