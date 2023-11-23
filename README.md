@@ -38,9 +38,9 @@ The Orbbec SDK ROS2 Wrapper is a ROS2 wrapper for the [Orbbec SDK](https://githu
 
 Please refer to the official guide:
 
-- [Ubuntu (Debian): Foxy](https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Debians.html)
-- [Ubuntu (Debian): Galactic](https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html)
-- [Ubuntu (Debian): Humble](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)
+- [Ubuntu 20.04 LTS: Foxy](https://docs.ros.org/en/foxy/Installation/Ubuntu-Install-Debians.html)
+- [Ubuntu 20.04 LTS: Galactic](https://docs.ros.org/en/galactic/Installation/Ubuntu-Install-Debians.html)
+- [Ubuntu 22.04 LTS: Humble](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)
 - More guides for other ROS2 distributions and operating systems can be found [here](https://docs.ros.org/).
 
 After installing ROS2, don't forget to source the environment: [Configuring-ROS2-Environment](https://index.ros.org/doc/ros2/Tutorials/Configuring-ROS2-Environment/)
