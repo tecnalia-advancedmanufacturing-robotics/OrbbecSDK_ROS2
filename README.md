@@ -178,7 +178,7 @@ The Orbbec SDK ROS2 Wrapper supports multiple devices, each with distinct featur
 
 | **products**     | **firmware version**             |**launch file**          |**description**                                           |
 | ---              | ---                              | ---                     | ---                                                     |
-| Gemini 2         | 1.4.60 /1.4.76                   | gemini2.launch.py       | [doc](orbbec_camera/launch/gemini2_desc)        |
+| Gemini 2         | 1.4.60 /1.4.76                   | gemini2.launch.py       | [doc](orbbec_camera/launch/gemini2_desc.md)        |
 | Gemini 2 L       | 1.4.32                           | gemini2L.launch.py      | [doc](orbbec_camera/launch/gemini2L_desc.md)       |
 | Gemini 2 XL      | Obox: V1.2.5  VL:1.4.54          | gemini2XL.launch.py     | [doc](orbbec_camera/launch/gemini2XL_desc.md)      |
 | Gemini           | 3.0.18                           | gemini.launch.py        | [doc](orbbec_camera/launch/gemini_desc.md)         |
