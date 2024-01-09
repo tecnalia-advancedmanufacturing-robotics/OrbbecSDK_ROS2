@@ -5,7 +5,7 @@
 Here, We exclusively list the parameters that are specific to the device and supported by the Orbbec Gemini 2.**Please read [docs/launch_file_parameters.md](../../docs/launch_file_parameters.md) at first to understand the basic parameters.**
 
 * `product_id`
-The product ID of Orbbec Gemini 2 is `0x0660`
+The product ID of Orbbec Gemini 2 is `0x0670`
 
 * `color_width`x`color_height`
 The resolution of color camera, supported value:
@@ -17,9 +17,11 @@ The resolution of color camera, supported value:
 
 * `color_fps`
 The frame rate of color camera, supported value:
+  * 5
+  * 10
   * 15, default
   * 30
-  * 60
+  * 60, only for 640 x 480 and 320 x 240 resolution in 'Binned Sparse Default' Mode
 
 * `color_format`
 supported color formats:
@@ -39,6 +41,8 @@ The resolution of depth camera, supported value:
 
 * `depth_fps`
 The frame rate of depth camera, supported value:
+  * 5
+  * 10
   * 15, default
   * 30
   * 60, only for 640 x 480 and 320 x 240 resolution in 'Binned Sparse Default' Mode
@@ -61,6 +65,8 @@ The resolution of infrared camera, supported profile:
 
 * `ir_fps`
 The frame rate of infrared camera, supported profile:
+  * 5
+  * 10
   * 15, default
   * 30
   * 60, only for 640 x 480 and 320 x 240 resolution in 'Binned Sparse Default' Mode
@@ -99,8 +105,8 @@ The range of gyroscope, supported value:
 
 * `sync_mode`
 The synchronization mode of the device, supported value:
-  * free_run, default
-  * standalone
+  * free_run
+  * standalone, default
   * primary
   * secondary-synced
   * software triggering
