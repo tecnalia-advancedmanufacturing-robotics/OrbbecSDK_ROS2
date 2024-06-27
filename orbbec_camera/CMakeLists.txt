@@ -12,8 +12,12 @@ option(USE_RK_HW_DECODER "Use Rockchip hardware decoder" OFF)
 option(USE_NV_HW_DECODER "Use Nvidia hardware decoder" OFF)
 
 
+# add sse3 support
+if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+  add_compile_options(-msse3 -mavx2)
+endif ()
 if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(-Wall -Wextra -Werror -Wno-pedantic -Wno-array-bounds)
+  add_compile_options(-Wall -Wextra -Wno-error -Wno-pedantic -Wno-array-bounds)
 endif ()
 # Check if ROS Jazzy or iron is installed
 if ("$ENV{ROS_DISTRO}" STREQUAL "jazzy")
@@ -143,7 +147,7 @@ set(SOURCE_FILES
   src/synced_imu_publisher.cpp
   src/utils.cpp
   src/jpeg_decoder.cpp
-  src/color-formats-converter.cpp
+  include/orbbec_camera/color-formats-converter.h
   src/image-avx.cpp
 )
 
@@ -208,9 +212,9 @@ rclcpp_components_register_node(${PROJECT_NAME}
   EXECUTABLE orbbec_camera_node
 )
 # Add nodes using the macro
-add_orbbec_executable(list_devices_node src/list_devices_node.cpp)
-add_orbbec_executable(list_depth_work_mode_node src/list_depth_work_mode.cpp)
-add_orbbec_executable(list_camera_profile_mode_node src/list_camera_profile.cpp)
+#add_orbbec_executable(list_devices_node src/list_devices_node.cpp)
+#add_orbbec_executable(list_depth_work_mode_node src/list_depth_work_mode.cpp)
+#add_orbbec_executable(list_camera_profile_mode_node src/list_camera_profile.cpp)
 
 # Install rules
 install(TARGETS ${PROJECT_NAME}
@@ -231,10 +235,6 @@ if (DEFINED ENV{BUILDING_PACKAGE})
   )
 endif ()
 
-install(TARGETS list_devices_node
-  list_depth_work_mode_node
-  list_camera_profile_mode_node
-  DESTINATION lib/${PROJECT_NAME}/)
 
 if (BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

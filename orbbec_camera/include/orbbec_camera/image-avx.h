@@ -5,7 +5,7 @@
 
 using byte= unsigned char;
 
-namespace astra_camera
+namespace orbbec_camera
 {
 #ifndef ANDROID
 #if defined(__SSSE3__) && defined(__AVX2__)
