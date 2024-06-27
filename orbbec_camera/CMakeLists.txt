@@ -143,6 +143,8 @@ set(SOURCE_FILES
   src/synced_imu_publisher.cpp
   src/utils.cpp
   src/jpeg_decoder.cpp
+  src/color-formats-converter.cpp
+  src/image-avx.cpp
 )
 
 if (USE_RK_HW_DECODER)
