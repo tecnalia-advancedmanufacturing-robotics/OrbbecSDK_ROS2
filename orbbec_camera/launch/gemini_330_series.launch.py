@@ -57,7 +57,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_ir_auto_exposure', default_value='true'),
         DeclareLaunchArgument('ir_exposure', default_value='-1'),
         DeclareLaunchArgument('ir_gain', default_value='-1'),
-        DeclareLaunchArgument('enable_sync_output_accel_gyro', default_value='true'),
+        DeclareLaunchArgument('enable_sync_output_accel_gyro', default_value='false'),
         DeclareLaunchArgument('enable_accel', default_value='false'),
         DeclareLaunchArgument('accel_rate', default_value='200hz'),
         DeclareLaunchArgument('accel_range', default_value='4g'),
