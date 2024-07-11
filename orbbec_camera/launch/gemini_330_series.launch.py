@@ -36,7 +36,7 @@ def generate_launch_description():
         DeclareLaunchArgument('depth_width', default_value='1280'),
         DeclareLaunchArgument('depth_height', default_value='800'),
         DeclareLaunchArgument('depth_fps', default_value='30'),
-        DeclareLaunchArgument('depth_format', default_value='YUYV'),
+        DeclareLaunchArgument('depth_format', default_value='Y16'),
         DeclareLaunchArgument('enable_depth', default_value='true'),
         DeclareLaunchArgument('depth_qos', default_value='default'),
         DeclareLaunchArgument('depth_camera_info_qos', default_value='default'),
