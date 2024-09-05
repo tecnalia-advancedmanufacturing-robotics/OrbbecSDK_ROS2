@@ -1,0 +1,23 @@
+# front camera
+front_color_image: "/front_camera/color/image_raw"
+front_depth_image: "/front_camera/depth/image_raw"
+front_left_ir_image: "/front_camera/left_ir/image_raw"
+front_right_ir_image: "/front_camera/right_ir/image_raw"
+
+# left camera
+left_color_image: "/left_camera/color/image_raw"
+left_depth_image: "/left_camera/depth/image_raw"
+left_left_ir_image: "/left_camera/left_ir/image_raw"
+left_right_ir_image: "/left_camera/right_ir/image_raw"
+
+# right camera
+right_color_image: "/right_camera/color/image_raw"
+right_depth_image: "/right_camera/depth/image_raw"
+right_left_ir_image: "/right_camera/left_ir/image_raw"
+right_right_ir_image: "/right_camera/right_ir/image_raw"
+
+# rear camera
+rear_color_image: "/rear_camera/color/image_raw"
+rear_depth_image: "/frearcamera/depth/image_raw"
+rear_left_ir_image: "/rear_camera/left_ir/image_raw"
+rear_right_ir_image: "/rear_camera/right_ir/image_raw"

@@ -12,16 +12,32 @@
 #include <filesystem>
 
 namespace orbbec_camera {
-namespace tools {
+// namespace tools {
 
 class TopicStatistics : public rclcpp::Node {
  public:
-  TopicStatistics() : Node("topic_statistics") {
-    this->declare_parameter("image_topic", "/camera/color/image_raw");
+  // 带有 rclcpp::NodeOptions 的构造函数
+  TopicStatistics(const rclcpp::NodeOptions & options)
+    : Node("topic_statistics", options) {
+    this->declare_parameter("front_color_image", "/front_camera/color/image_raw");
+    this->declare_parameter("front_depth_image", "/front_camera/depth/image_raw");
+    this->declare_parameter("front_left_ir_image", "/front_camera/left_ir/image_raw");
+    this->declare_parameter("front_right_ir_image", "/front_camera/right_ir/image_raw");
+
     this->declare_parameter("statistics_topic", "/statistics");
 
-    image_topic_ = this->get_parameter("image_topic").as_string();
+    front_color_image_topic_ = this->get_parameter("front_color_image").as_string();
+    front_depth_image_topic_ = this->get_parameter("front_depth_image").as_string();
+    front_left_ir_image_topic_ = this->get_parameter("front_left_ir_image").as_string();
+    front_right_ir_image_topic_ = this->get_parameter("front_right_ir_image").as_string();
+
+    RCLCPP_INFO(get_logger(), "Front color image topic: %s", front_color_image_topic_.c_str());
+    RCLCPP_INFO(get_logger(), "Front depth image topic: %s", front_depth_image_topic_.c_str());
+    RCLCPP_INFO(get_logger(), "Front left IR image topic: %s", front_left_ir_image_topic_.c_str());
+    RCLCPP_INFO(get_logger(), "Front right IR image topic: %s", front_right_ir_image_topic_.c_str());
+
     statistics_topic_ = this->get_parameter("statistics_topic").as_string();
+    RCLCPP_INFO(get_logger(), "Statistics topic: %s", statistics_topic_.c_str());
 
     RCLCPP_INFO(get_logger(), "TopicStatistics starting up");
     initialize();
@@ -35,16 +51,22 @@ class TopicStatistics : public rclcpp::Node {
     sub_opt.topic_stats_options.publish_topic = statistics_topic_;
     sub_opt.topic_stats_options.publish_period = std::chrono::milliseconds(1000);
 
-    image_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
-        image_topic_, 10, std::bind(&TopicStatistics::image_callback, this, std::placeholders::_1),
-        sub_opt);
+    front_color_image_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
+        front_color_image_topic_, 10, std::bind(&TopicStatistics::front_color_image_callback, this, std::placeholders::_1), sub_opt);
+    front_depth_image_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
+        front_depth_image_topic_, 10, std::bind(&TopicStatistics::front_depth_image_callback, this, std::placeholders::_1), sub_opt);
+    front_left_ir_image_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
+        front_left_ir_image_topic_, 10, std::bind(&TopicStatistics::front_left_ir_image_callback, this, std::placeholders::_1), sub_opt);
+    front_right_ir_image_sub_ = this->create_subscription<sensor_msgs::msg::Image>(
+        front_right_ir_image_topic_, 10, std::bind(&TopicStatistics::front_right_ir_image_callback, this, std::placeholders::_1), sub_opt);
 
     // Create a subscriber to the statistics topic
     statistics_sub_ = this->create_subscription<statistics_msgs::msg::MetricsMessage>(
         statistics_topic_, 10,
         std::bind(&TopicStatistics::statistics_callback, this, std::placeholders::_1));
 
-    RCLCPP_INFO(get_logger(), "Subscribed to image topic: %s", image_topic_.c_str());
+    RCLCPP_INFO(get_logger(), "Subscribed to image topic: %s", front_color_image_topic_.c_str());
+
     RCLCPP_INFO(get_logger(), "Subscribed to statistics topic: %s", statistics_topic_.c_str());
   }
 
@@ -123,10 +145,28 @@ class TopicStatistics : public rclcpp::Node {
   }
 
  private:
-  void image_callback(const sensor_msgs::msg::Image::UniquePtr msg) {
-    image_count_++;
-    image_size_ += msg->data.size();
-    RCLCPP_DEBUG(get_logger(), "Received image %d, size: %zu bytes", image_count_,
+  void front_color_image_callback(const sensor_msgs::msg::Image::UniquePtr msg) {
+    front_color_image_count_++;
+    front_color_image_size_ += msg->data.size();
+    RCLCPP_DEBUG(get_logger(), "front_color_image_callback image %d, size: %zu bytes", front_color_image_count_,
+                 msg->data.size());
+  }
+  void front_depth_image_callback(const sensor_msgs::msg::Image::UniquePtr msg) {
+    front_depth_image_count_++;
+    front_depth_image_size_ += msg->data.size();
+    RCLCPP_DEBUG(get_logger(), "front_depth_image_callback image %d, size: %zu bytes", front_depth_image_count_,
+                 msg->data.size());
+  }
+  void front_left_ir_image_callback(const sensor_msgs::msg::Image::UniquePtr msg) {
+    front_left_ir_image_count_++;
+    front_left_ir_image_size_ += msg->data.size();
+    RCLCPP_DEBUG(get_logger(), "front_left_ir_image_callback image %d, size: %zu bytes", front_left_ir_image_count_,
+                 msg->data.size());
+  }
+  void front_right_ir_image_callback(const sensor_msgs::msg::Image::UniquePtr msg) {
+    front_right_ir_image_count_++;
+    front_right_ir_image_size_ += msg->data.size();
+    RCLCPP_DEBUG(get_logger(), "front_right_ir_image_callback image %d, size: %zu bytes", front_right_ir_image_count_,
                  msg->data.size());
   }
 
@@ -166,16 +206,32 @@ class TopicStatistics : public rclcpp::Node {
     }
   }
 
-  rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr image_sub_;
+  rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr front_color_image_sub_;
+  rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr front_depth_image_sub_;
+  rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr front_left_ir_image_sub_;
+  rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr front_right_ir_image_sub_;
+
   rclcpp::Subscription<statistics_msgs::msg::MetricsMessage>::SharedPtr statistics_sub_;
 
-  std::string image_topic_;
+  std::string front_color_image_topic_;
+  std::string front_depth_image_topic_;
+  std::string front_left_ir_image_topic_;
+  std::string front_right_ir_image_topic_;
+
   std::string statistics_topic_;
-  int image_count_ = 0;
-  size_t image_size_ = 0;
+
+  int front_color_image_count_ = 0;
+  size_t front_color_image_size_ = 0;
+  int front_depth_image_count_ = 0;
+  size_t front_depth_image_size_ = 0;
+  int front_left_ir_image_count_ = 0;
+  size_t front_left_ir_image_size_ = 0;
+  int front_right_ir_image_count_ = 0;
+  size_t front_right_ir_image_size_ = 0;
+
   std::string csv_path_;
   bool csv_initialized_ = false;
 };
 
-}  // namespace tools
+// }  // namespace tools
 }  // namespace orbbec_camera

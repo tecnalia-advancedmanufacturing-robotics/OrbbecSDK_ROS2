@@ -205,17 +205,29 @@ ament_target_dependencies(${PROJECT_NAME} ${dependencies})
 target_include_directories(${PROJECT_NAME} PUBLIC ${COMMON_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} ${COMMON_LIBRARIES})
 
+set(STATICS_PROJECT_NAME topic_statistics_core)
+add_library(${STATICS_PROJECT_NAME} SHARED
+tools/topic_statistics.cpp
+)
+
+ament_target_dependencies(${STATICS_PROJECT_NAME} ${dependencies})
+target_include_directories(${STATICS_PROJECT_NAME} PUBLIC ${COMMON_INCLUDE_DIRS})
+target_link_libraries(${STATICS_PROJECT_NAME} ${COMMON_LIBRARIES})
 
 rclcpp_components_register_node(${PROJECT_NAME}
   PLUGIN "orbbec_camera::OBCameraNodeDriver"
   EXECUTABLE orbbec_camera_node
+)
+rclcpp_components_register_node(${STATICS_PROJECT_NAME}
+  PLUGIN "orbbec_camera::TopicStatistics"
+  EXECUTABLE topic_statistics_compose_node
 )
 # Add nodes using the macro
 add_orbbec_executable(list_devices_node tools/list_devices_node.cpp)
 add_orbbec_executable(list_depth_work_mode_node tools/list_depth_work_mode.cpp)
 add_orbbec_executable(list_camera_profile_mode_node tools/list_camera_profile.cpp)
 
-add_orbbec_executable(topic_statistics_node tools/topic_statistics.cpp)
+# add_orbbec_executable(topic_statistics_node tools/topic_statistics.cpp)
 
 
 add_library(frame_latency SHARED tools/frame_latency.cpp)
@@ -228,7 +240,7 @@ rclcpp_components_register_node(frame_latency
         EXECUTABLE frame_latency_node
 )
 # Install rules
-install(TARGETS ${PROJECT_NAME} frame_latency
+install(TARGETS ${PROJECT_NAME} frame_latency ${STATICS_PROJECT_NAME}
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION bin
@@ -249,7 +261,7 @@ endif ()
 install(TARGETS list_devices_node
   list_depth_work_mode_node
   list_camera_profile_mode_node
-  topic_statistics_node
+#   topic_statistics_node
   DESTINATION lib/${PROJECT_NAME}/)
 
 if (BUILD_TESTING)
