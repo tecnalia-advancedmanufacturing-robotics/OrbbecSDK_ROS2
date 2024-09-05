@@ -79,7 +79,7 @@ class TopicStatistics : public rclcpp::Node {
     std::ofstream csv_file(csv_path_, std::ios::out);
     if (csv_file.is_open()) {
       // Write the header to the CSV file
-      csv_file << "\"_time\",\"message_type\",\"min\",\"avg\",\"max\"\n";
+      csv_file << "\"_time\",\"message_type\",\"min\",\"avg\",\"max\",\"sample_count\",\"std_dev\"\n";
       csv_file.close();
       csv_initialized_ = true;
     } else {
@@ -113,11 +113,16 @@ class TopicStatistics : public rclcpp::Node {
         message_type = "unknown";
       }
 
+      if (message_type == "age") {
+        return;  // Age statistics are not written to CSV
+      }
+
       // Write the timestamp and message type to the CSV file
       csv_file << "\"" << time_str << "\",\"" << message_type << "\",";
 
       // Variables to store the min, avg, and max values
       double min = 0, avg = 0, max = 0;
+      double sample_count = 0, std_dev = 0;
 
       // Iterate through the statistics and assign values based on the type
       for (const auto& statistic : msg.statistics) {
@@ -131,13 +136,19 @@ class TopicStatistics : public rclcpp::Node {
           case 3:  // max
             max = statistic.data;
             break;
+          case 4:  // std_dev
+            std_dev = statistic.data;
+            break;
+          case 5:  // sample_count
+            sample_count = statistic.data;
+            break;
           default:
             break;
         }
       }
 
       // Write the min, avg, and max values to the CSV file
-      csv_file << min << " ms," << avg << " ms," << max << " ms\n";
+      csv_file << min << " ms," << avg << " ms," << max << " ms, " << sample_count << " , "<< std_dev << "\n";
       csv_file.close();
     } else {
       RCLCPP_ERROR(get_logger(), "Unable to open statistics.csv for writing");
@@ -171,7 +182,7 @@ class TopicStatistics : public rclcpp::Node {
   }
 
   void statistics_callback(const statistics_msgs::msg::MetricsMessage::UniquePtr msg) {
-    RCLCPP_INFO(get_logger(), "Statistics received:\n%s", metrics_message_to_string(*msg).c_str());
+    // RCLCPP_INFO(get_logger(), "Statistics received:\n%s", metrics_message_to_string(*msg).c_str());
     write_statistics_to_csv(*msg);
   }
 

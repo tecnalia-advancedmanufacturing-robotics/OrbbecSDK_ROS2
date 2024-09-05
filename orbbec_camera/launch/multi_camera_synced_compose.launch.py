@@ -100,11 +100,10 @@ def generate_launch_description():
 
     # If you need more cameras, just add more launch_include here, and change the usb_port and device_num
 
-    # 使用ExecuteProcess添加延时
-    delay_process = ExecuteProcess(
-        cmd=[f"sleep {3}"],  # 使用sleep命令进行延时
-        output='screen'
-    )
+    delay_action = TimerAction(
+        period=3.0,  # 延迟 3 秒
+        actions=[front_camera]
+        )
 
     # Launch description
     ld = LaunchDescription([
@@ -112,8 +111,8 @@ def generate_launch_description():
         rear_camera,
         left_camera,
         right_camera,
-        # delay_process,
-        front_camera, # The primary camera should be launched at last
+        # front_camera, # The primary camera should be launched at last
+        delay_action,
         load_topic_statistics,
     ])
 
