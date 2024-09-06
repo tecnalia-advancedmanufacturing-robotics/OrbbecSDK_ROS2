@@ -18,6 +18,6 @@ right_right_ir_image: "/right_camera/right_ir/image_raw"
 
 # rear camera
 rear_color_image: "/rear_camera/color/image_raw"
-rear_depth_image: "/frearcamera/depth/image_raw"
+rear_depth_image: "/rear_camera/depth/image_raw"
 rear_left_ir_image: "/rear_camera/left_ir/image_raw"
 rear_right_ir_image: "/rear_camera/right_ir/image_raw"
