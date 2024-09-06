@@ -6,7 +6,7 @@ from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import PushRosNamespace, ComposableNodeContainer, Node
 from launch_ros.descriptions import ComposableNode
 from launch_ros.actions import LoadComposableNodes
-
+from launch.conditions import IfCondition, UnlessCondition
 def load_yaml(file_path):
     with open(file_path, 'r') as f:
         return yaml.safe_load(f)
@@ -168,6 +168,8 @@ def generate_launch_description():
         DeclareLaunchArgument('config_file_path', default_value=''),
         DeclareLaunchArgument('enable_heartbeat', default_value='false'),
         DeclareLaunchArgument('component_container_name', default_value='shared_camera_container'),
+        DeclareLaunchArgument('attach_to_shared_component_container', default_value='false'),
+        DeclareLaunchArgument('intra_process_comms', default_value='false'),
     ]
 
     def get_params(context, args):
@@ -175,20 +177,13 @@ def generate_launch_description():
 
     def create_node_action(context, args):
         params = get_params(context, args)
-
-        shared_container_name = LaunchConfiguration("component_container_name")
-        camera_node = ComposableNode(
-            package='orbbec_camera',
-            plugin='orbbec_camera::OBCameraNodeDriver',
-            name=LaunchConfiguration("camera_name"),
-            parameters=params,
-            extra_arguments=[{'use_intra_process_comms': True}],
+        camera_container_node = Node(
+            name=LaunchConfiguration("component_container_name"),
+            package='rclcpp_components',
+            executable='component_container_mt',
+            output='screen',
+            condition=UnlessCondition(LaunchConfiguration("attach_to_shared_component_container"))
         )
-        load_camera_node = LoadComposableNodes(
-            target_container=shared_container_name,
-            composable_node_descriptions=[camera_node]
-        )
-
         ros_distro = os.environ.get("ROS_DISTRO", "humble")
         if ros_distro == "foxy":
             return [
@@ -203,27 +198,23 @@ def generate_launch_description():
             ]
         else:
             return [
-                PushRosNamespace(LaunchConfiguration("camera_name")),
-                load_camera_node,
-
-                # GroupAction([
-                #     PushRosNamespace(LaunchConfiguration("camera_name")),
-                #     ComposableNodeContainer(
-                #         name="camera_container",
-                #         namespace="",
-                #         package="rclcpp_components",
-                #         executable="component_container",
-                #         composable_node_descriptions=[
-                #             ComposableNode(
-                #                 package="orbbec_camera",
-                #                 plugin="orbbec_camera::OBCameraNodeDriver",
-                #                 name=LaunchConfiguration("camera_name"),
-                #                 parameters=params,
-                #             ),
-                #         ],
-                #         output="screen",
-                #     )
-                # ])
+                GroupAction([
+                    camera_container_node,
+                    PushRosNamespace(LaunchConfiguration("camera_name")),
+                    LoadComposableNodes(
+                        target_container=LaunchConfiguration("component_container_name"),
+                        composable_node_descriptions=[
+                            ComposableNode(
+                                package="orbbec_camera",
+                                plugin="orbbec_camera::OBCameraNodeDriver",
+                                name=LaunchConfiguration("camera_name"),
+                                parameters=params,
+                                extra_arguments=[{'use_intra_process_comms': LaunchConfiguration("intra_process_comms")}],
+                            ),
+                        ],
+                        output="screen",
+                    )
+                ])
             ]
 
     return LaunchDescription(
