@@ -327,7 +327,7 @@ class TopicStatistics : public rclcpp::Node {
   }
 
   void statistics_callback(const statistics_msgs::msg::MetricsMessage::UniquePtr msg) {
-    // RCLCPP_INFO(get_logger(), "Statistics received:\n%s", metrics_message_to_string(*msg).c_str());
+    RCLCPP_INFO(get_logger(), "Statistics received:\n%s", metrics_message_to_string(*msg).c_str());
     write_statistics_to_csv(*msg);
   }
 

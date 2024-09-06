@@ -85,13 +85,13 @@ def generate_launch_description():
 
     camera_topics_config = os.path.join(get_package_share_directory("orbbec_camera"), "config", "camera_topics.yaml")
     print("Camera topics config path: ", camera_topics_config)  # 打印路径以调试
-    print(os.environ.get('LD_LIBRARY_PATH'))
 
     topic_statistics = ComposableNode(
         package='orbbec_camera',
         plugin='orbbec_camera::TopicStatistics',
         name='topic_statistics_compose_node',
         parameters=[camera_topics_config],
+        extra_arguments=[{'use_intra_process_comms': True}],
     )
     load_topic_statistics = LoadComposableNodes(
         target_container=shared_container_name,

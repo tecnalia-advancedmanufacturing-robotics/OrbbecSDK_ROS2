@@ -5,7 +5,7 @@ from launch.actions import DeclareLaunchArgument, OpaqueFunction, GroupAction
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import PushRosNamespace, ComposableNodeContainer, Node
 from launch_ros.descriptions import ComposableNode
-
+from launch_ros.actions import LoadComposableNodes
 
 def load_yaml(file_path):
     with open(file_path, 'r') as f:
@@ -167,6 +167,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_color_undistortion', default_value='false'),
         DeclareLaunchArgument('config_file_path', default_value=''),
         DeclareLaunchArgument('enable_heartbeat', default_value='false'),
+        DeclareLaunchArgument('component_container_name', default_value='shared_camera_container'),
     ]
 
     def get_params(context, args):
@@ -174,6 +175,20 @@ def generate_launch_description():
 
     def create_node_action(context, args):
         params = get_params(context, args)
+
+        shared_container_name = LaunchConfiguration("component_container_name")
+        camera_node = ComposableNode(
+            package='orbbec_camera',
+            plugin='orbbec_camera::OBCameraNodeDriver',
+            name=LaunchConfiguration("camera_name"),
+            parameters=params,
+            extra_arguments=[{'use_intra_process_comms': True}],
+        )
+        load_camera_node = LoadComposableNodes(
+            target_container=shared_container_name,
+            composable_node_descriptions=[camera_node]
+        )
+
         ros_distro = os.environ.get("ROS_DISTRO", "humble")
         if ros_distro == "foxy":
             return [
@@ -188,24 +203,27 @@ def generate_launch_description():
             ]
         else:
             return [
-                GroupAction([
-                    PushRosNamespace(LaunchConfiguration("camera_name")),
-                    ComposableNodeContainer(
-                        name="camera_container",
-                        namespace="",
-                        package="rclcpp_components",
-                        executable="component_container",
-                        composable_node_descriptions=[
-                            ComposableNode(
-                                package="orbbec_camera",
-                                plugin="orbbec_camera::OBCameraNodeDriver",
-                                name=LaunchConfiguration("camera_name"),
-                                parameters=params,
-                            ),
-                        ],
-                        output="screen",
-                    )
-                ])
+                PushRosNamespace(LaunchConfiguration("camera_name")),
+                load_camera_node,
+
+                # GroupAction([
+                #     PushRosNamespace(LaunchConfiguration("camera_name")),
+                #     ComposableNodeContainer(
+                #         name="camera_container",
+                #         namespace="",
+                #         package="rclcpp_components",
+                #         executable="component_container",
+                #         composable_node_descriptions=[
+                #             ComposableNode(
+                #                 package="orbbec_camera",
+                #                 plugin="orbbec_camera::OBCameraNodeDriver",
+                #                 name=LaunchConfiguration("camera_name"),
+                #                 parameters=params,
+                #             ),
+                #         ],
+                #         output="screen",
+                #     )
+                # ])
             ]
 
     return LaunchDescription(
